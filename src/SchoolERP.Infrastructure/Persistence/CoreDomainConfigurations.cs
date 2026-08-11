@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SchoolERP.Domain.Academic;
 using SchoolERP.Domain.Attendance;
+using SchoolERP.Domain.Grading;
 using SchoolERP.Domain.People;
 using SchoolERP.Domain.Platform;
 
@@ -201,6 +202,7 @@ internal sealed class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollm
             entity.Id,
             entity.SectionId
         });
+        builder.HasAlternateKey(entity => new { entity.TenantId, entity.Id });
         builder.Property(entity => entity.Status).HasConversion<string>().HasMaxLength(20);
         builder.HasIndex(entity => new
         {
@@ -235,6 +237,64 @@ internal sealed class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollm
                 entity.AcademicYearId,
                 entity.Id
             })
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+}
+
+internal sealed class AssessmentConfiguration : IEntityTypeConfiguration<Assessment>
+{
+    public void Configure(EntityTypeBuilder<Assessment> builder)
+    {
+        builder.ToTable("Assessments");
+        builder.HasKey(entity => entity.Id);
+        builder.HasAlternateKey(entity => new { entity.TenantId, entity.Id });
+        builder.Property(entity => entity.Name).HasMaxLength(200).IsRequired();
+        builder.Property(entity => entity.MaximumScore).HasPrecision(18, 4);
+        builder.HasIndex(entity => new { entity.TenantId, entity.SectionId, entity.AssessmentDate });
+        builder.HasOne(entity => entity.Section).WithMany()
+            .HasForeignKey(entity => new { entity.TenantId, entity.SectionId })
+            .HasPrincipalKey(entity => new { entity.TenantId, entity.Id })
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+}
+
+internal sealed class GradeConfiguration : IEntityTypeConfiguration<Grade>
+{
+    public void Configure(EntityTypeBuilder<Grade> builder)
+    {
+        builder.ToTable("Grades");
+        builder.HasKey(entity => entity.Id);
+        builder.HasAlternateKey(entity => new { entity.TenantId, entity.Id });
+        builder.Property(entity => entity.Score).HasPrecision(18, 4);
+        builder.Property(entity => entity.Status).HasConversion<string>().HasMaxLength(20);
+        builder.Property(entity => entity.CreatedBy).HasMaxLength(200).IsRequired();
+        builder.Property(entity => entity.UpdatedBy).HasMaxLength(200).IsRequired();
+        builder.HasIndex(entity => new { entity.TenantId, entity.AssessmentId, entity.EnrollmentId }).IsUnique();
+        builder.HasOne(entity => entity.Assessment).WithMany()
+            .HasForeignKey(entity => new { entity.TenantId, entity.AssessmentId })
+            .HasPrincipalKey(entity => new { entity.TenantId, entity.Id })
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(entity => entity.Enrollment).WithMany()
+            .HasForeignKey(entity => new { entity.TenantId, entity.EnrollmentId })
+            .HasPrincipalKey(entity => new { entity.TenantId, entity.Id })
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+}
+
+internal sealed class GradeCorrectionConfiguration : IEntityTypeConfiguration<GradeCorrection>
+{
+    public void Configure(EntityTypeBuilder<GradeCorrection> builder)
+    {
+        builder.ToTable("GradeCorrections");
+        builder.HasKey(entity => entity.Id);
+        builder.Property(entity => entity.PreviousScore).HasPrecision(18, 4);
+        builder.Property(entity => entity.NewScore).HasPrecision(18, 4);
+        builder.Property(entity => entity.Reason).HasMaxLength(1000).IsRequired();
+        builder.Property(entity => entity.CorrectedBy).HasMaxLength(200).IsRequired();
+        builder.HasIndex(entity => new { entity.TenantId, entity.GradeId, entity.CorrectedAt });
+        builder.HasOne(entity => entity.Grade).WithMany()
+            .HasForeignKey(entity => new { entity.TenantId, entity.GradeId })
+            .HasPrincipalKey(entity => new { entity.TenantId, entity.Id })
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

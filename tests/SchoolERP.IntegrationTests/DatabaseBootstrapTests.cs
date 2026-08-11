@@ -34,6 +34,8 @@ public sealed class DatabaseBootstrapTests
                     migration => migration.EndsWith(
                         "_Phase21AttendanceFoundation",
                         StringComparison.Ordinal));
+                Assert.Contains(appliedMigrations, migration => migration.EndsWith(
+                    "_Phase22AssessmentGradesFoundation", StringComparison.Ordinal));
             }
 
             using var client = factory.CreateHttpsClient();
