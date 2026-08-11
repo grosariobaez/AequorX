@@ -12,6 +12,7 @@ The original attachments have been preserved byte-for-byte in the repository:
 | `docs/architecture/technical-architecture-gate-1.1.md` | Approved technical stack and Gate 1.1 decisions | `97BD5C9CA98D6B401715C69620E8B403F776956577038FB5D4389B1BA1708174` |
 | `docs/requirements/phase-1.2-solution-bootstrap.md` | Exact execution contract and Definition of Done for Phase 1.2 | `0592868DC60005B77D23F563CEF9B6B51322ED78F6D0C11B311376BBA4E47F6A` |
 | `docs/architecture/bootstrap-architecture-review-gate-1.3.md` | Exact review contract required after Phase 1.2 and before any business slice | `1BBFA23B23BBDFCC75F1F9D22ED7257A376C4F70A58782DFB32607A8F12EC82E` |
+| `docs/requirements/phase-1.2-execution-prompt.md` | Explicit implementation authorization and operational contract for executing Phase 1.2 | `371FB260D5DCBF8C02FFC6E7664DA03645E3CC3E522404A18E30CACE042C53A5` |
 
 Do not rely on this summary in place of the full documents. Read the applicable source before making changes.
 
@@ -19,8 +20,9 @@ Do not rely on this summary in place of the full documents. Read the applicable 
 
 - Product: multi-tenant SaaS ERP for private schools in the Dominican Republic.
 - Architecture: modular monolith; one backend deployment, one relational database, one Angular application.
-- Current authorized work: **Phase 1.2 — Solution Bootstrap only**.
-- Coding is authorized for technical bootstrap, not for business features.
+- Phase 1.2 status: **implemented and locally validated on 2026-08-11**.
+- Phase 1.3 has not been executed. It is the next eligible gate and requires an explicit user request.
+- Phase 2.0 and all business features remain unauthorized.
 - The repository was initially empty except for `.git`; the governing documents and this memory layer are the first project files.
 - Phase 1.3 is a future strict review gate. It becomes applicable only after Phase 1.2 is implemented and validated; merely storing its document does not advance the project phase.
 
@@ -29,6 +31,20 @@ Do not rely on this summary in place of the full documents. Read the applicable 
 The bootstrap must prove that the approved architecture can compile, run, connect to local SQL, apply an initial migration without fake domain tables, expose `/health/live` and `/health/ready`, provide development OpenAPI, serve a minimal Angular shell, run automated and architecture tests, initialize telemetry without cloud credentials, and pass GitHub Actions CI.
 
 The target solution contains four backend projects (`Api`, `Application`, `Domain`, `Infrastructure`), four test projects (`Domain.Tests`, `Application.Tests`, `IntegrationTests`, `ArchitectureTests`), and one Angular application (`Web`). It must remain intentionally small.
+
+## Implemented bootstrap state
+
+- .NET SDK 10.0.302; ASP.NET Core and EF Core packages 10.0.10.
+- One empty Domain boundary and one empty Application boundary; no business types exist.
+- `SchoolERPDbContext` has no business `DbSet`; migration `20260811162159_InitialBootstrap` creates only EF migration history.
+- Local SQL Server 2022 Express connectivity and migration application were validated.
+- API exposes `/health/live`, `/health/ready`, and development OpenAPI. Liveness remains healthy with SQL unavailable; readiness becomes 503 without leaking connection details.
+- OpenTelemetry instruments ASP.NET Core, HTTP, runtime, and SQL; Azure Monitor export activates only when environment configuration is present.
+- Angular 22.1 uses strict TypeScript, one standalone application, routing, a responsive Spanish technical shell, and typed health integration through the development proxy.
+- Four .NET test projects execute seven tests total; Angular executes one meaningful Vitest shell/HTTP test.
+- One GitHub Actions workflow restores, builds, tests, lints, and uses an ephemeral SQL Server container with a generated test password.
+- Final local results: .NET restore/build/test, npm ci/lint/test/build, database migration, API/frontend startup, both health states, frontend proxy, formatting, NuGet vulnerability scan, npm audit, and secret scan passed.
+- No accepted bootstrap architecture debt or known code issue. GitHub-hosted CI execution awaits a push or pull request and is not claimed as locally executed.
 
 ## Non-negotiable constraints
 

@@ -7,19 +7,20 @@ Before modifying this repository, read these documents completely:
 1. `docs/SDD.md`
 2. `docs/architecture/technical-architecture-gate-1.1.md`
 3. `docs/requirements/phase-1.2-solution-bootstrap.md`
-4. `docs/architecture/bootstrap-architecture-review-gate-1.3.md` when reviewing or completing the bootstrap
-5. every applicable file under `docs/architecture/adr/` once that directory exists
-6. `PROJECT_MEMORY.md`
+4. `docs/requirements/phase-1.2-execution-prompt.md` when implementing or validating Phase 1.2
+5. `docs/architecture/bootstrap-architecture-review-gate-1.3.md` when reviewing or completing the bootstrap
+6. every applicable file under `docs/architecture/adr/` once that directory exists
+7. `PROJECT_MEMORY.md`
 
 The full documents are authoritative; this file is only a navigation and safety layer. If instructions conflict with the approved SDD or an approved ADR, stop only the affected work, report the conflict, and continue independent safe work.
 
 ## Current phase
 
-The authorized phase is **Phase 1.2 — Solution Bootstrap**. Build only the repository and technical foundation needed to compile, run, connect to local SQL, migrate, expose health/OpenAPI endpoints, serve Angular, test, emit telemetry, enforce architecture boundaries, and run CI.
+**Phase 1.2 — Solution Bootstrap is implemented and locally validated.** Phase 1.3 has not been executed. The next eligible task is the Phase 1.3 architecture review, and it must not begin without an explicit user request.
 
 Do not implement business features yet, including Student, Enrollment, Attendance, Grades, Billing, Payments, DGII, or Parent Portal functionality. Do not invent business concepts, placeholder entities, fake provider implementations, speculative interfaces, or empty architecture ceremony.
 
-After Phase 1.2 is genuinely complete, perform the Phase 1.3 architecture review before beginning any business vertical slice. Phase 1.3 may return only `PASS`, `PASS WITH REQUIRED FIXES`, or `FAIL`; it does not authorize Phase 2.0 automatically. Do not begin Phase 2.0 without an explicit user request.
+Phase 1.3 may return only `PASS`, `PASS WITH REQUIRED FIXES`, or `FAIL`; it does not authorize Phase 2.0 automatically. Do not begin Phase 2.0 without an explicit user request.
 
 ## Fixed technical baseline
 

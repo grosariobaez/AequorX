@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Start isolated SQL Server
+        shell: bash
+        run: |
+          sql_password="Sql_$(openssl rand -hex 16)!aA1"
+          echo "::add-mask::$sql_password"
+          docker run --name schoolerp-sql \
+            --env ACCEPT_EULA=Y \
+            --env MSSQL_SA_PASSWORD="$sql_password" \
+            --publish 1433:1433 \
+            --detach mcr.microsoft.com/mssql/server:2022-latest
+          for attempt in {1..30}; do
+            if docker exec schoolerp-sql /opt/mssql-tools18/bin/sqlcmd \
+              -S localhost -U sa -P "$sql_password" -C -Q "SELECT 1" > /dev/null 2>&1; then
+              break
+            fi
+            if [ "$attempt" = 30 ]; then
+              docker logs schoolerp-sql
+              exit 1
+            fi
+            sleep 2
+          done
+          echo "SCHOOLERP_TEST_SQL_CONNECTION_STRING=Server=localhost,1433;Database=SchoolERP_IntegrationTests;User Id=sa;Password=$sql_password;TrustServerCertificate=True" >> "$GITHUB_ENV"
+
+      - name: Restore backend
+        run: dotnet restore SchoolERP.sln
+
+      - name: Build backend
+        run: dotnet build SchoolERP.sln --configuration Release --no-restore
+
+      - name: Test backend
+        run: dotnet test SchoolERP.sln --configuration Release --no-build
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.15.0
+          cache: npm
+          cache-dependency-path: src/SchoolERP.Web/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: src/SchoolERP.Web
+        run: npm ci
+
+      - name: Lint frontend
+        working-directory: src/SchoolERP.Web
+        run: npm run lint
+
+      - name: Test frontend
+        working-directory: src/SchoolERP.Web
+        run: npm test
+
+      - name: Build frontend
+        working-directory: src/SchoolERP.Web
+        run: npm run build
