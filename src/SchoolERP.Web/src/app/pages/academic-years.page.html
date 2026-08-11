@@ -1,0 +1,12 @@
+<div class="page-header"><h1>{{ i18n.text('academicYears') }}</h1></div>
+<section class="panel"><h2>{{ i18n.text('newAcademicYear') }}</h2><form class="form-grid" (ngSubmit)="create()">
+  <label><span>{{ i18n.text('name') }}</span><input name="name" [(ngModel)]="form.name" required /></label>
+  <label><span>{{ i18n.text('startDate') }}</span><input name="startDate" type="date" [(ngModel)]="form.startDate" required /></label>
+  <label><span>{{ i18n.text('endDate') }}</span><input name="endDate" type="date" [(ngModel)]="form.endDate" required /></label>
+  <label><span>{{ i18n.text('status') }}</span><select name="status" [(ngModel)]="form.status"><option value="Planned">{{ i18n.status('Planned') }}</option><option value="Active">{{ i18n.status('Active') }}</option><option value="Closed">{{ i18n.status('Closed') }}</option></select></label>
+  <button type="submit">{{ i18n.text('create') }}</button>
+</form></section>
+@if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+<div class="table-wrap"><table><thead><tr><th>{{ i18n.text('name') }}</th><th>{{ i18n.text('startDate') }}</th><th>{{ i18n.text('endDate') }}</th><th>{{ i18n.text('status') }}</th></tr></thead><tbody>
+@for (year of years(); track year.id) { <tr><td>{{ year.name }}</td><td>{{ year.startDate }}</td><td>{{ year.endDate }}</td><td>{{ i18n.status(year.status) }}</td></tr> } @empty { <tr><td colspan="4" class="empty">{{ i18n.text('noRecords') }}</td></tr> }
+</tbody></table></div>

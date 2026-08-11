@@ -22,7 +22,8 @@ Do not rely on this summary in place of the full documents. Read the applicable 
 - Architecture: modular monolith; one backend deployment, one relational database, one Angular application.
 - Phase 1.2 status: **implemented and locally validated on 2026-08-11**.
 - Phase 1.3 status: **passed on 2026-08-11 after correcting two gate defects and rerunning all validation**.
-- Phase 2.0 may now be proposed, but it has not been started and still requires an explicit user request.
+- Phase 2.0 status: **implemented and locally validated on its dedicated branch on 2026-08-11; Draft PR review is pending**.
+- Phase 2.0 was explicitly authorized by `Phase 2.0 — Core Domain Foundation.md` (attachment SHA-256 `0BD63664FBAAAB79F1A96E7477F6B4B0CADDDE8A4A35C18224808870DD95C748`).
 - The repository was initially empty except for `.git`; the governing documents and this memory layer are the first project files.
 - Phase 1.3 independently reviewed the implemented bootstrap; its pass advances only the architecture gate and does not implement or authorize a business slice.
 
@@ -46,6 +47,17 @@ The target solution contains four backend projects (`Api`, `Application`, `Domai
 - Phase 1.3 corrected two required issues: `/` previously redirected to the not-found route while bootstrap content lived globally, and the migration test could reuse an already migrated database. The shell now uses an explicit `Home` route, and the migration test creates, migrates, verifies, and deletes a unique database on every run.
 - Phase 1.3 local results: clean .NET restore/build with 0 warnings, 7/7 .NET tests, format verification, EF migration listing/application against a new database, npm reproducible install with 0 vulnerabilities, lint, 2/2 Angular tests, production build, API/frontend startup, OpenAPI, live/ready health, frontend proxy, controlled SQL failure, vulnerability scan, and secret scan all passed.
 - GitHub-hosted CI execution awaits a push or pull request and is not claimed as locally executed.
+
+## Phase 2.0 implementation state
+
+- The implemented domain is limited to Tenant, Campus, Person, StudentProfile, StudentRelationship, AcademicYear, GradeLevel, Section, and Enrollment.
+- Tenant scope comes from the server-side `ITenantContext`; API contracts do not accept a tenant identifier, and EF Core global filters enforce tenant-scoped reads.
+- Domain constructors enforce same-tenant relationships, valid academic-year dates, and section/year consistency. Tenant-aware keys and foreign keys reinforce these rules in SQL.
+- Migration `20260811194820_Phase20CoreDomainFoundation` creates the nine authorized tables and their constraints.
+- The API provides the minimal Phase 2.0 query/create surface. Development-only tenant provisioning is explicit; production tenant configuration remains external.
+- Angular provides six minimal management screens with Spanish as the default language and an English switch.
+- Local Phase 2.0 validation passed: clean .NET build with 0 warnings/errors, 16/16 .NET tests, format verification, Angular lint, 2/2 Angular tests, and production build.
+- No next phase is authorized. Attendance, grades, billing, payments, fiscal work, portals, admissions, notifications, AI, and advanced workflows remain deferred.
 
 ## Accepted bootstrap architecture debt
 
@@ -78,6 +90,6 @@ Background-job framework, notification vendor, IaC tool, frontend component libr
 
 ## Working rule
 
-Phase 1.3 has independently audited repository simplicity, dependency direction, domain purity, packages, API host, health and failure behavior, EF Core/migrations, tenant readiness, Angular, security, observability, CI, tests, documentation, configuration, ADR integrity, reproducibility, runtime behavior, and vulnerabilities.
+Phase 1.3 independently audited the technical foundation. Phase 2.0 adds only its explicitly authorized core-domain slice and remains subject to Draft PR review.
 
-The next phase must remain proposal-only until explicitly requested. Do not infer Phase 2.0 authorization from the Phase 1.3 pass.
+The next phase must remain proposal-only until explicitly requested. Do not infer further authorization from Phase 2.0 implementation.

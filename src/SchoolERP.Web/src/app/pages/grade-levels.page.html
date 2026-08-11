@@ -1,0 +1,11 @@
+<div class="page-header"><h1>{{ i18n.text('gradeLevels') }}</h1></div>
+<section class="panel"><h2>{{ i18n.text('newGradeLevel') }}</h2><form class="form-grid" (ngSubmit)="create()">
+  <label><span>{{ i18n.text('name') }}</span><input name="name" [(ngModel)]="form.name" required /></label>
+  <label><span>{{ i18n.text('code') }}</span><input name="code" [(ngModel)]="form.code" required /></label>
+  <label><span>{{ i18n.text('sortOrder') }}</span><input name="sortOrder" type="number" [(ngModel)]="form.sortOrder" required /></label>
+  <button type="submit">{{ i18n.text('create') }}</button>
+</form></section>
+@if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+<div class="table-wrap"><table><thead><tr><th>{{ i18n.text('code') }}</th><th>{{ i18n.text('name') }}</th><th>{{ i18n.text('sortOrder') }}</th></tr></thead><tbody>
+@for (grade of grades(); track grade.id) { <tr><td>{{ grade.code }}</td><td>{{ grade.name }}</td><td>{{ grade.sortOrder }}</td></tr> } @empty { <tr><td colspan="3" class="empty">{{ i18n.text('noRecords') }}</td></tr> }
+</tbody></table></div>

@@ -1,0 +1,17 @@
+<div class="page-header"><h1>{{ i18n.text('students') }}</h1></div>
+
+<section class="panel">
+  <h2>{{ i18n.text('newStudent') }}</h2>
+  <form class="form-grid" (ngSubmit)="create()">
+    <label><span>{{ i18n.text('person') }}</span><select name="personId" [(ngModel)]="form.personId" required><option value=""></option>@for (person of people(); track person.id) { <option [value]="person.id">{{ person.firstName }} {{ person.lastName }}</option> }</select></label>
+    <label><span>{{ i18n.text('studentNumber') }}</span><input name="studentNumber" [(ngModel)]="form.studentNumber" required /></label>
+    <button type="submit" [disabled]="!form.personId">{{ i18n.text('create') }}</button>
+  </form>
+</section>
+
+@if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+
+<div class="table-wrap"><table>
+  <thead><tr><th>{{ i18n.text('studentNumber') }}</th><th>{{ i18n.text('name') }}</th><th>{{ i18n.text('status') }}</th></tr></thead>
+  <tbody>@for (student of students(); track student.personId) { <tr><td>{{ student.studentNumber }}</td><td>{{ student.firstName }} {{ student.lastName }}</td><td>{{ i18n.text(student.isActive ? 'active' : 'inactive') }}</td></tr> } @empty { <tr><td colspan="3" class="empty">{{ i18n.text('noRecords') }}</td></tr> }</tbody>
+</table></div>

@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Security;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace SchoolERP.Api;
 
@@ -43,6 +44,8 @@ internal sealed class ApiExceptionHandler(
     private static ApiError Map(Exception exception) => exception switch
     {
         ValidationException => new(StatusCodes.Status400BadRequest, "Validation", "Validation failed."),
+        ArgumentException => new(StatusCodes.Status400BadRequest, "Validation", "Validation failed."),
+        DbUpdateException => new(StatusCodes.Status409Conflict, "ConstraintViolation", "The request violates a data constraint."),
         UnauthorizedAccessException => new(StatusCodes.Status401Unauthorized, "Unauthorized", "Authentication is required."),
         SecurityException => new(StatusCodes.Status403Forbidden, "Forbidden", "Access is forbidden."),
         KeyNotFoundException => new(StatusCodes.Status404NotFound, "NotFound", "The requested resource was not found."),

@@ -1,10 +1,32 @@
 <header>
-  <a class="brand" routerLink="/" aria-label="School ERP RD, inicio">School ERP RD</a>
-  <span>Base técnica</span>
+  <a class="brand" routerLink="/" [attr.aria-label]="i18n.text('appSubtitle')">AequorX</a>
+  <span>{{ i18n.text('appSubtitle') }}</span>
+  <label>
+    <span class="sr-only">{{ i18n.text('language') }}</span>
+    <select
+      [value]="i18n.language()"
+      (change)="setLanguage($any($event.target).value)"
+    >
+      <option value="es">{{ i18n.text('spanish') }}</option>
+      <option value="en">{{ i18n.text('english') }}</option>
+    </select>
+  </label>
 </header>
 
-<main>
-  <router-outlet />
-</main>
+<div class="workspace">
+  <nav [attr.aria-label]="i18n.text('appSubtitle')">
+    <a routerLink="/people" routerLinkActive="active">{{ i18n.text('people') }}</a>
+    <a routerLink="/students" routerLinkActive="active">{{ i18n.text('students') }}</a>
+    <p>{{ i18n.text('academicStructure') }}</p>
+    <a routerLink="/academic-years" routerLinkActive="active">{{ i18n.text('academicYears') }}</a>
+    <a routerLink="/grade-levels" routerLinkActive="active">{{ i18n.text('gradeLevels') }}</a>
+    <a routerLink="/sections" routerLinkActive="active">{{ i18n.text('sections') }}</a>
+    <a routerLink="/enrollments" routerLinkActive="active">{{ i18n.text('enrollments') }}</a>
+  </nav>
 
-<footer>School ERP RD · República Dominicana</footer>
+  <main>
+    <router-outlet />
+  </main>
+</div>
+
+<footer>{{ i18n.text('footer') }}</footer>
