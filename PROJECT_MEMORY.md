@@ -26,7 +26,7 @@ Do not rely on this summary in place of the full documents. Read the applicable 
 - Phase 2.0 was explicitly authorized by `Phase 2.0 — Core Domain Foundation.md` (attachment SHA-256 `0BD63664FBAAAB79F1A96E7477F6B4B0CADDDE8A4A35C18224808870DD95C748`).
 - Phase 2.1 status: **complete and merged into `main` on 2026-08-11**.
 - Phase 2.1 was explicitly authorized by `Phase 2.1 — Attendance Foundation.md` (attachment SHA-256 `75219B07966052689AA0B97AB57DF9CB062ADF067A6955C9E3EEFB1DF790F0DF`).
-- Phase 2.2 status: **implemented and locally validated on its dedicated branch on 2026-08-11; Draft PR review is pending**.
+- Phase 2.2 status: **complete and merged into `main` on 2026-08-11**.
 - Phase 2.2 was explicitly authorized by `Phase 2.2 — Assessment & Grades Foundation.md` (attachment SHA-256 `C69A65D4387E33CA4468951FB67D0B3DB956CC7547A64D7DB6264D56EECC58F6`).
 - The repository was initially empty except for `.git`; the governing documents and this memory layer are the first project files.
 - Phase 1.3 independently reviewed the implemented bootstrap; its pass advances only the architecture gate and does not implement or authorize a business slice.
@@ -83,7 +83,7 @@ The target solution contains four backend projects (`Api`, `Application`, `Domai
 - GradeCorrection is append-only and preserves PreviousScore, NewScore, Reason, CorrectedAt, and server-derived CorrectedBy for every correction. The current Grade becomes Corrected.
 - Migration `20260811205022_Phase22AssessmentGradesFoundation` adds Assessments, Grades, GradeCorrections, and tenant-aware constraints.
 - The API exposes only the five required assessment, grade-entry, publish, and correction capabilities. Angular adds one focused Spanish-default/English-secondary grading screen.
-- Local validation passed: clean .NET build, 35/35 .NET tests, format verification, Angular lint, 4/4 Angular tests, and production build. GitHub-hosted CI awaits the Draft PR and is not yet claimed.
+- Phase 2.2 validation passed: clean .NET build, 35/35 .NET tests, format verification, Angular lint, 4/4 Angular tests, production build, and GitHub-hosted CI.
 - No next phase is authorized. Subjects/classes, teacher assignments, schedules, weighting, GPA, promotion, report cards, term averages, grading scales, competencies/rubrics, notifications, portals, AI, billing, and fiscal work remain deferred.
 
 ## Accepted bootstrap architecture debt
@@ -117,6 +117,6 @@ Background-job framework, notification vendor, IaC tool, frontend component libr
 
 ## Working rule
 
-Phase 1.3 independently audited the technical foundation. Phases 2.0 and 2.1 are merged. Phase 2.2 remains subject to Draft PR review.
+Phase 1.3 independently audited the technical foundation. Phases 2.0, 2.1, and 2.2 are complete and merged.
 
 The next phase must remain proposal-only until explicitly requested. Do not infer further authorization from Phase 2.2 implementation.

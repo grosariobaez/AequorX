@@ -16,7 +16,7 @@ The full documents are authoritative; this file is only a navigation and safety 
 
 ## Current phase
 
-**Phase 2.2 — Assessment & Grades Foundation is implemented and locally validated on its dedicated branch; Draft PR review is pending.** Phases 1.2 and 1.3 are complete. Phases 2.0 and 2.1 are complete and merged.
+**Phase 2.2 — Assessment & Grades Foundation is complete and merged.** Phases 1.2 and 1.3 are complete. Phases 2.0 and 2.1 are complete and merged.
 
 Phase 2.2 is limited to Assessment, Grade, GradeCorrection, the Draft/Published/Corrected lifecycle, the minimal grading API, and one localized grading screen. Do not implement subjects/classes, teacher assignments, schedules, weighting, GPA, promotion, report cards, averages, grading scales, competencies/rubrics, notifications, portals, AI, billing, or fiscal work.
 
