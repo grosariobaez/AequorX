@@ -16,7 +16,7 @@ The full documents are authoritative; this file is only a navigation and safety 
 
 ## Current phase
 
-**Phase 2.1 — Attendance Foundation is implemented and locally validated on its dedicated branch; Draft PR review is pending.** Phase 1.2 and Phase 1.3 are complete. Phase 2.0 is complete and merged.
+**Phase 2.1 — Attendance Foundation is complete and merged.** Phase 1.2 and Phase 1.3 are complete. Phase 2.0 is complete and merged.
 
 Phase 2.1 is limited to AttendanceRecord, four attendance exception statuses, Present-by-absence, correction through the defined application operation, server-derived audit identity, the minimal attendance API, and one localized attendance screen. Do not implement schedules, periods, subjects/classes, teacher assignment, notifications, absence justification workflows, medical notes, dashboards, grades, assessments, billing, or AI.
 
