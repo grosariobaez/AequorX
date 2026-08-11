@@ -1,0 +1,13 @@
+<div class="page-header"><h1>{{ i18n.text('enrollments') }}</h1></div>
+<section class="panel"><h2>{{ i18n.text('newEnrollment') }}</h2><form class="form-grid" (ngSubmit)="create()">
+  <label><span>{{ i18n.text('students') }}</span><select name="studentPersonId" [(ngModel)]="form.studentPersonId" required><option value=""></option>@for (student of students(); track student.personId) { <option [value]="student.personId">{{ student.studentNumber }} · {{ student.firstName }} {{ student.lastName }}</option> }</select></label>
+  <label><span>{{ i18n.text('academicYear') }}</span><select name="academicYearId" [(ngModel)]="form.academicYearId" required><option value=""></option>@for (year of years(); track year.id) { <option [value]="year.id">{{ year.name }}</option> }</select></label>
+  <label><span>{{ i18n.text('section') }}</span><select name="sectionId" [(ngModel)]="form.sectionId" required><option value=""></option>@for (section of sections(); track section.id) { <option [value]="section.id">{{ section.name }} · {{ section.gradeLevelName }}</option> }</select></label>
+  <label><span>{{ i18n.text('status') }}</span><select name="status" [(ngModel)]="form.status"><option value="Pending">{{ i18n.status('Pending') }}</option><option value="Active">{{ i18n.status('Active') }}</option><option value="Withdrawn">{{ i18n.status('Withdrawn') }}</option><option value="Transferred">{{ i18n.status('Transferred') }}</option><option value="Completed">{{ i18n.status('Completed') }}</option></select></label>
+  <label><span>{{ i18n.text('enrollmentDate') }}</span><input name="enrollmentDate" type="date" [(ngModel)]="form.enrollmentDate" required /></label>
+  <button type="submit">{{ i18n.text('create') }}</button>
+</form></section>
+@if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+<div class="table-wrap"><table><thead><tr><th>{{ i18n.text('studentNumber') }}</th><th>{{ i18n.text('students') }}</th><th>{{ i18n.text('academicYear') }}</th><th>{{ i18n.text('section') }}</th><th>{{ i18n.text('status') }}</th></tr></thead><tbody>
+@for (enrollment of enrollments(); track enrollment.id) { <tr><td>{{ enrollment.studentNumber }}</td><td>{{ enrollment.studentName }}</td><td>{{ enrollment.academicYearName }}</td><td>{{ enrollment.sectionName }}</td><td>{{ i18n.status(enrollment.status) }}</td></tr> } @empty { <tr><td colspan="5" class="empty">{{ i18n.text('noRecords') }}</td></tr> }
+</tbody></table></div>

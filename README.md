@@ -1,6 +1,8 @@
 # School ERP RD
 
-School ERP RD is the technical foundation for a multi-tenant SaaS ERP serving private schools in the Dominican Republic. Phase 1.2 contains infrastructure only—no school business features.
+AequorX is a multi-tenant SaaS ERP for private schools in the Dominican Republic.
+Phase 2.0 adds the first core-domain vertical slice: people, students, academic
+structure, and historical enrollment.
 
 ## Architecture
 
@@ -11,6 +13,7 @@ School ERP RD is the technical foundation for a multi-tenant SaaS ERP serving pr
 - Azure App Service, Key Vault, and Managed Identity direction
 - OpenTelemetry with optional Azure Monitor/Application Insights export
 - GitHub Actions CI
+- Server-derived tenant context with centralized EF Core query filters
 
 The dependency direction is `Api → Application → Domain`, with `Api → Infrastructure` and `Infrastructure → Application + Domain`. Domain has no framework or infrastructure dependency.
 
@@ -45,7 +48,10 @@ Production supplies `ConnectionStrings__SchoolERP` through App Service/Managed I
 
 The committed development default uses Windows authentication with `localhost\SQLEXPRESS` and database `SchoolERP_Development`. It contains no password. Override `ConnectionStrings__SchoolERP` when using another local SQL instance.
 
-The DbContext intentionally has no business `DbSet`. The initial migration is empty; applying it creates only EF Core's technical migration-history table.
+The initial bootstrap migration creates only EF Core migration history. The
+Phase 2.0 migration adds Tenant, Campus, Person, StudentProfile,
+StudentRelationship, AcademicYear, GradeLevel, Section, and Enrollment with
+tenant-aware constraints.
 
 ## Migrations
 
@@ -77,6 +83,20 @@ Local endpoints:
 - `https://localhost:7080/health/ready` — readiness including SQL connectivity
 - `https://localhost:7080/openapi/v1.json` — development-only OpenAPI document
 
+The development tenant identifier is server configuration. After applying
+migrations, provision it once through the development-only endpoint:
+
+```powershell
+Invoke-RestMethod -Method Post -Uri https://localhost:7080/api/tenant `
+  -SkipCertificateCheck `
+  -ContentType "application/json" `
+  -Body '{"name":"Development School","code":"DEV"}'
+```
+
+Core routes are under `/api/people`, `/api/students`,
+`/api/academic-years`, `/api/grade-levels`, `/api/sections`, and
+`/api/enrollments`. Campus setup uses `/api/campuses`.
+
 ## Frontend
 
 In another terminal:
@@ -86,11 +106,18 @@ cd src\SchoolERP.Web
 npm start
 ```
 
-Open `http://localhost:4200`. The development proxy forwards `/health` to the HTTPS API at port 7080.
+Open `http://localhost:4200`. The development proxy forwards API requests to
+the HTTPS API at port 7080. The administration UI defaults to Spanish; use the
+header language selector for English.
 
 ## Tests
 
-Backend tests create and remove a uniquely named `SchoolERP_IntegrationTests_<guid>` database on local SQL Express. To use another instance, set `SCHOOLERP_TEST_SQL_CONNECTION_STRING` outside source control; the database name in that base connection is replaced for the migration test.
+Backend tests create and remove a uniquely named
+`SchoolERP_IntegrationTests_<guid>` database on local SQL Express. They cover
+domain invariants, tenant filtering, relational constraints, migration, health,
+and the minimal enrollment API workflow. To use another instance, set
+`SCHOOLERP_TEST_SQL_CONNECTION_STRING` outside source control; its database
+name is replaced for each relational test.
 
 ```powershell
 dotnet restore SchoolERP.sln
@@ -128,3 +155,4 @@ Validate any change with `dotnet list package --vulnerable --include-transitive`
 - [Phase 1.2 execution contract](docs/requirements/phase-1.2-execution-prompt.md)
 - [Phase 1.3 review gate](docs/architecture/bootstrap-architecture-review-gate-1.3.md)
 - [Architecture decisions](docs/architecture/adr/)
+- [Core domain foundation](docs/domain/core-domain-foundation.md)

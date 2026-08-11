@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { I18nService } from './core/i18n.service';
 
 @Component({
   selector: 'app-not-found',
@@ -7,10 +8,12 @@ import { RouterLink } from '@angular/router';
   template: `
     <section aria-labelledby="not-found-title">
       <p class="eyebrow">404</p>
-      <h2 id="not-found-title">Página no encontrada</h2>
-      <p>La ruta solicitada no existe en esta base técnica.</p>
-      <a routerLink="/">Volver al inicio</a>
+      <h2 id="not-found-title">{{ i18n.text('notFound') }}</h2>
+      <p>{{ i18n.text('routeMissing') }}</p>
+      <a routerLink="/">{{ i18n.text('backHome') }}</a>
     </section>
   `,
 })
-export class NotFound {}
+export class NotFound {
+  protected readonly i18n = inject(I18nService);
+}

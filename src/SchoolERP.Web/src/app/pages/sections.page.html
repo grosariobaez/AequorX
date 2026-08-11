@@ -1,0 +1,19 @@
+<div class="page-header"><h1>{{ i18n.text('sections') }}</h1></div>
+<section class="panel"><h2>{{ i18n.text('newCampus') }}</h2><form class="form-grid" (ngSubmit)="createCampus()">
+  <label><span>{{ i18n.text('name') }}</span><input name="campusName" [(ngModel)]="campusForm.name" required /></label>
+  <label><span>{{ i18n.text('code') }}</span><input name="campusCode" [(ngModel)]="campusForm.code" required /></label>
+  <button type="submit">{{ i18n.text('create') }}</button>
+</form></section>
+<section class="panel"><h2>{{ i18n.text('newSection') }}</h2><form class="form-grid" (ngSubmit)="create()">
+  <label><span>{{ i18n.text('academicYear') }}</span><select name="academicYearId" [(ngModel)]="form.academicYearId" required><option value=""></option>@for (year of years(); track year.id) { <option [value]="year.id">{{ year.name }}</option> }</select></label>
+  <label><span>{{ i18n.text('gradeLevel') }}</span><select name="gradeLevelId" [(ngModel)]="form.gradeLevelId" required><option value=""></option>@for (grade of grades(); track grade.id) { <option [value]="grade.id">{{ grade.name }}</option> }</select></label>
+  <label><span>{{ i18n.text('campus') }}</span><select name="campusId" [(ngModel)]="form.campusId" required><option value=""></option>@for (campus of campuses(); track campus.id) { <option [value]="campus.id">{{ campus.name }}</option> }</select></label>
+  <label><span>{{ i18n.text('name') }}</span><input name="name" [(ngModel)]="form.name" required /></label>
+  <label><span>{{ i18n.text('code') }}</span><input name="code" [(ngModel)]="form.code" required /></label>
+  <label><span>{{ i18n.text('capacity') }}</span><input name="capacity" type="number" [(ngModel)]="form.capacity" /></label>
+  <button type="submit">{{ i18n.text('create') }}</button>
+</form></section>
+@if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+<div class="table-wrap"><table><thead><tr><th>{{ i18n.text('code') }}</th><th>{{ i18n.text('name') }}</th><th>{{ i18n.text('academicYear') }}</th><th>{{ i18n.text('gradeLevel') }}</th><th>{{ i18n.text('campus') }}</th></tr></thead><tbody>
+@for (section of sections(); track section.id) { <tr><td>{{ section.code }}</td><td>{{ section.name }}</td><td>{{ section.academicYearName }}</td><td>{{ section.gradeLevelName }}</td><td>{{ section.campusName }}</td></tr> } @empty { <tr><td colspan="5" class="empty">{{ i18n.text('noRecords') }}</td></tr> }
+</tbody></table></div>

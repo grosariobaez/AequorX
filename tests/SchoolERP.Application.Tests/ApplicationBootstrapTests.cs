@@ -1,14 +1,14 @@
-using System.Reflection;
+using SchoolERP.Application.Tenancy;
 
 namespace SchoolERP.Application.Tests;
 
 public sealed class ApplicationBootstrapTests
 {
     [Fact]
-    public void Application_contains_no_speculative_public_types()
+    public void Application_exposes_only_the_current_tenant_contract()
     {
-        var application = Assembly.Load("SchoolERP.Application");
+        var exportedTypes = typeof(ITenantContext).Assembly.ExportedTypes.ToArray();
 
-        Assert.Empty(application.ExportedTypes);
+        Assert.Equal([typeof(ITenantContext)], exportedTypes);
     }
 }

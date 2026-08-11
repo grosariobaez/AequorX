@@ -9,6 +9,8 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
 {
     private readonly string _testConnectionString;
 
+    public Guid TenantId { get; } = Guid.NewGuid();
+
     public ApiFactory(string? connectionString = null, bool isolateDatabase = false)
     {
         var configuredConnectionString = connectionString
@@ -40,6 +42,8 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
             configuration.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["ConnectionStrings:SchoolERP"] = _testConnectionString
+                ,
+                ["Tenant:Id"] = TenantId.ToString()
             });
         });
     }

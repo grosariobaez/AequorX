@@ -1,9 +1,20 @@
 import { Routes } from '@angular/router';
-import { Home } from './home';
+import { AcademicYearsPage } from './pages/academic-years.page';
+import { EnrollmentsPage } from './pages/enrollments.page';
+import { GradeLevelsPage } from './pages/grade-levels.page';
+import { PeoplePage } from './pages/people.page';
+import { SectionsPage } from './pages/sections.page';
+import { StudentsPage } from './pages/students.page';
 import { NotFound } from './not-found';
 
 export const routes: Routes = [
-  { path: '', component: Home, pathMatch: 'full' },
+  { path: '', redirectTo: 'people', pathMatch: 'full' },
+  { path: 'people', component: PeoplePage },
+  { path: 'students', component: StudentsPage },
+  { path: 'academic-years', component: AcademicYearsPage },
+  { path: 'grade-levels', component: GradeLevelsPage },
+  { path: 'sections', component: SectionsPage },
+  { path: 'enrollments', component: EnrollmentsPage },
   { path: 'not-found', component: NotFound },
   { path: '**', redirectTo: 'not-found' },
 ];

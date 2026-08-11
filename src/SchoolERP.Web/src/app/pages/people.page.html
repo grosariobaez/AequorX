@@ -1,0 +1,36 @@
+<div class="page-header">
+  <h1>{{ i18n.text('people') }}</h1>
+  <div class="command-bar">
+    <label>
+      <span class="sr-only">{{ i18n.text('search') }}</span>
+      <input [(ngModel)]="search" [placeholder]="i18n.text('search')" (keyup.enter)="load()" />
+    </label>
+    <button type="button" (click)="load()">{{ i18n.text('search') }}</button>
+  </div>
+</div>
+
+<section class="panel">
+  <h2>{{ i18n.text('newPerson') }}</h2>
+  <form class="form-grid" (ngSubmit)="create()">
+    <label><span>{{ i18n.text('firstName') }}</span><input name="firstName" [(ngModel)]="form.firstName" required /></label>
+    <label><span>{{ i18n.text('lastName') }}</span><input name="lastName" [(ngModel)]="form.lastName" required /></label>
+    <label><span>{{ i18n.text('email') }}</span><input name="email" type="email" [(ngModel)]="form.email" /></label>
+    <label><span>{{ i18n.text('phone') }}</span><input name="phone" [(ngModel)]="form.phone" /></label>
+    <button type="submit">{{ i18n.text('create') }}</button>
+  </form>
+</section>
+
+@if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>{{ i18n.text('name') }}</th><th>{{ i18n.text('email') }}</th><th>{{ i18n.text('phone') }}</th><th>{{ i18n.text('status') }}</th></tr></thead>
+    <tbody>
+      @for (person of people(); track person.id) {
+        <tr><td>{{ person.firstName }} {{ person.lastName }}</td><td>{{ person.email }}</td><td>{{ person.phone }}</td><td>{{ i18n.text(person.isActive ? 'active' : 'inactive') }}</td></tr>
+      } @empty {
+        <tr><td colspan="4" class="empty">{{ i18n.text('noRecords') }}</td></tr>
+      }
+    </tbody>
+  </table>
+</div>

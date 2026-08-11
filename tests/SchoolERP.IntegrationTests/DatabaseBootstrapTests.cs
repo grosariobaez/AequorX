@@ -24,6 +24,11 @@ public sealed class DatabaseBootstrapTests
                 Assert.Contains(
                     appliedMigrations,
                     migration => migration.EndsWith("_InitialBootstrap", StringComparison.Ordinal));
+                Assert.Contains(
+                    appliedMigrations,
+                    migration => migration.EndsWith(
+                        "_Phase20CoreDomainFoundation",
+                        StringComparison.Ordinal));
             }
 
             using var client = factory.CreateHttpsClient();
