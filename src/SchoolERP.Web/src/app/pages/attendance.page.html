@@ -1,0 +1,78 @@
+<div class="page-header">
+  <h1>{{ i18n.text('attendance') }}</h1>
+</div>
+
+<section class="panel">
+  <form class="form-grid" (ngSubmit)="load()">
+    <label>
+      <span>{{ i18n.text('date') }}</span>
+      <input name="date" type="date" [(ngModel)]="date" required />
+    </label>
+    <label>
+      <span>{{ i18n.text('section') }}</span>
+      <select name="sectionId" [(ngModel)]="sectionId" required>
+        <option value=""></option>
+        @for (section of sections(); track section.id) {
+          <option [value]="section.id">
+            {{ section.name }} · {{ section.gradeLevelName }} · {{ section.academicYearName }}
+          </option>
+        }
+      </select>
+    </label>
+    <button type="submit" [disabled]="!sectionId || !date">
+      {{ i18n.text('loadRoster') }}
+    </button>
+  </form>
+</section>
+
+@if (error()) {
+  <p class="error" role="alert">{{ error() }}</p>
+}
+@if (confirmation()) {
+  <p role="status">{{ confirmation() }}</p>
+}
+
+<div class="command-bar">
+  <button type="button" (click)="save()" [disabled]="saving() || students().length === 0">
+    {{ i18n.text('save') }}
+  </button>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>{{ i18n.text('studentNumber') }}</th>
+        <th>{{ i18n.text('student') }}</th>
+        <th>{{ i18n.text('status') }}</th>
+        <th>{{ i18n.text('note') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (student of students(); track student.enrollmentId) {
+        <tr>
+          <td>{{ student.studentNumber }}</td>
+          <td>{{ student.studentName }}</td>
+          <td>
+            <select
+              [attr.aria-label]="i18n.text('status') + ' · ' + student.studentName"
+              [(ngModel)]="student.status"
+            >
+              @for (status of statuses; track status) {
+                <option [value]="status">{{ i18n.status(status) }}</option>
+              }
+            </select>
+          </td>
+          <td>
+            <input
+              [attr.aria-label]="i18n.text('note') + ' · ' + student.studentName"
+              [(ngModel)]="student.note"
+            />
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="4" class="empty">{{ i18n.text('noRecords') }}</td></tr>
+      }
+    </tbody>
+  </table>
+</div>

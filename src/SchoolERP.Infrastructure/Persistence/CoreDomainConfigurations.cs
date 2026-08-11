@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SchoolERP.Domain.Academic;
+using SchoolERP.Domain.Attendance;
 using SchoolERP.Domain.People;
 using SchoolERP.Domain.Platform;
 
@@ -152,6 +153,7 @@ internal sealed class SectionConfiguration : IEntityTypeConfiguration<Section>
     {
         builder.ToTable("Sections");
         builder.HasKey(entity => entity.Id);
+        builder.HasAlternateKey(entity => new { entity.TenantId, entity.Id });
         builder.HasAlternateKey(entity => new
         {
             entity.TenantId,
@@ -193,6 +195,12 @@ internal sealed class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollm
     {
         builder.ToTable("Enrollments");
         builder.HasKey(entity => entity.Id);
+        builder.HasAlternateKey(entity => new
+        {
+            entity.TenantId,
+            entity.Id,
+            entity.SectionId
+        });
         builder.Property(entity => entity.Status).HasConversion<string>().HasMaxLength(20);
         builder.HasIndex(entity => new
         {
@@ -227,6 +235,48 @@ internal sealed class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollm
                 entity.AcademicYearId,
                 entity.Id
             })
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+}
+
+internal sealed class AttendanceRecordConfiguration
+    : IEntityTypeConfiguration<AttendanceRecord>
+{
+    public void Configure(EntityTypeBuilder<AttendanceRecord> builder)
+    {
+        builder.ToTable("AttendanceRecords");
+        builder.HasKey(entity => entity.Id);
+        builder.Property(entity => entity.Status).HasConversion<string>().HasMaxLength(30);
+        builder.Property(entity => entity.Note).HasMaxLength(1000);
+        builder.Property(entity => entity.CreatedBy).HasMaxLength(200).IsRequired();
+        builder.Property(entity => entity.UpdatedBy).HasMaxLength(200).IsRequired();
+        builder.HasIndex(entity => new
+        {
+            entity.TenantId,
+            entity.EnrollmentId,
+            entity.AttendanceDate
+        }).IsUnique();
+        builder
+            .HasOne(entity => entity.Enrollment)
+            .WithMany()
+            .HasForeignKey(entity => new
+            {
+                entity.TenantId,
+                entity.EnrollmentId,
+                entity.SectionId
+            })
+            .HasPrincipalKey(entity => new
+            {
+                entity.TenantId,
+                entity.Id,
+                entity.SectionId
+            })
+            .OnDelete(DeleteBehavior.Restrict);
+        builder
+            .HasOne(entity => entity.Section)
+            .WithMany()
+            .HasForeignKey(entity => new { entity.TenantId, entity.SectionId })
+            .HasPrincipalKey(entity => new { entity.TenantId, entity.Id })
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

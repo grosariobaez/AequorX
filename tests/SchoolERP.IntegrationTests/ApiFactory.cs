@@ -41,9 +41,9 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
         {
             configuration.AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["ConnectionStrings:SchoolERP"] = _testConnectionString
-                ,
-                ["Tenant:Id"] = TenantId.ToString()
+                ["ConnectionStrings:SchoolERP"] = _testConnectionString,
+                ["Tenant:Id"] = TenantId.ToString(),
+                ["Audit:Actor"] = "integration-test-user"
             });
         });
     }

@@ -22,8 +22,10 @@ Do not rely on this summary in place of the full documents. Read the applicable 
 - Architecture: modular monolith; one backend deployment, one relational database, one Angular application.
 - Phase 1.2 status: **implemented and locally validated on 2026-08-11**.
 - Phase 1.3 status: **passed on 2026-08-11 after correcting two gate defects and rerunning all validation**.
-- Phase 2.0 status: **implemented and locally validated on its dedicated branch on 2026-08-11; Draft PR review is pending**.
+- Phase 2.0 status: **complete and merged into `main` on 2026-08-11**.
 - Phase 2.0 was explicitly authorized by `Phase 2.0 — Core Domain Foundation.md` (attachment SHA-256 `0BD63664FBAAAB79F1A96E7477F6B4B0CADDDE8A4A35C18224808870DD95C748`).
+- Phase 2.1 status: **implemented and locally validated on its dedicated branch on 2026-08-11; Draft PR review is pending**.
+- Phase 2.1 was explicitly authorized by `Phase 2.1 — Attendance Foundation.md` (attachment SHA-256 `75219B07966052689AA0B97AB57DF9CB062ADF067A6955C9E3EEFB1DF790F0DF`).
 - The repository was initially empty except for `.git`; the governing documents and this memory layer are the first project files.
 - Phase 1.3 independently reviewed the implemented bootstrap; its pass advances only the architecture gate and does not implement or authorize a business slice.
 
@@ -46,7 +48,7 @@ The target solution contains four backend projects (`Api`, `Application`, `Domai
 - One GitHub Actions workflow restores, builds, tests, lints, and uses an ephemeral SQL Server container with a generated test password.
 - Phase 1.3 corrected two required issues: `/` previously redirected to the not-found route while bootstrap content lived globally, and the migration test could reuse an already migrated database. The shell now uses an explicit `Home` route, and the migration test creates, migrates, verifies, and deletes a unique database on every run.
 - Phase 1.3 local results: clean .NET restore/build with 0 warnings, 7/7 .NET tests, format verification, EF migration listing/application against a new database, npm reproducible install with 0 vulnerabilities, lint, 2/2 Angular tests, production build, API/frontend startup, OpenAPI, live/ready health, frontend proxy, controlled SQL failure, vulnerability scan, and secret scan all passed.
-- GitHub-hosted CI execution awaits a push or pull request and is not claimed as locally executed.
+- The Phase 2.0 GitHub-hosted workflow passed before PR #2 was merged.
 
 ## Phase 2.0 implementation state
 
@@ -57,7 +59,19 @@ The target solution contains four backend projects (`Api`, `Application`, `Domai
 - The API provides the minimal Phase 2.0 query/create surface. Development-only tenant provisioning is explicit; production tenant configuration remains external.
 - Angular provides six minimal management screens with Spanish as the default language and an English switch.
 - Local Phase 2.0 validation passed: clean .NET build with 0 warnings/errors, 16/16 .NET tests, format verification, Angular lint, 2/2 Angular tests, and production build.
-- No next phase is authorized. Attendance, grades, billing, payments, fiscal work, portals, admissions, notifications, AI, and advanced workflows remain deferred.
+- Phase 2.0 closed with attendance and all later capabilities deferred; Phase 2.1 subsequently authorized only the attendance slice documented below.
+
+## Phase 2.1 implementation state
+
+- AttendanceRecord stores only exceptions: Absent, Late, Excused, and EarlyDeparture. No row means Present.
+- Attendance uses the existing tenant context and tenant-aware relational keys. Cross-tenant section or enrollment identifiers are hidden by query filters and rejected by composite foreign keys.
+- An active Enrollment must belong to the selected Section, and AttendanceDate must fall inside its AcademicYear. A unique tenant/enrollment/date index prevents duplicate exceptions.
+- Exception-to-exception corrections update the same record, preserve CreatedAt/CreatedBy, and set UpdatedAt/UpdatedBy. Restoring Present removes the exception only through the PUT attendance operation; no DELETE endpoint exists.
+- Audit identity comes from server-side `Audit:Actor` configuration. The API does not accept TenantId or audit identity.
+- Migration `20260811202308_Phase21AttendanceFoundation` adds the attendance table and required tenant-aware constraints.
+- The API exposes only `GET /api/attendance` and `PUT /api/attendance/{enrollmentId}/{date}`. Angular adds one attendance-entry screen using the existing Spanish-default/English-secondary localization mechanism.
+- Local Phase 2.1 validation passed: clean .NET build, 24/24 .NET tests, format verification, Angular lint, 3/3 Angular tests, and production build. GitHub-hosted CI awaits the Draft PR and is not yet claimed.
+- No next phase is authorized. Schedules, periods, subjects/classes, teacher assignment, notifications, justification workflows, medical notes, dashboards, grades, assessments, billing, and AI remain deferred.
 
 ## Accepted bootstrap architecture debt
 
@@ -90,6 +104,6 @@ Background-job framework, notification vendor, IaC tool, frontend component libr
 
 ## Working rule
 
-Phase 1.3 independently audited the technical foundation. Phase 2.0 adds only its explicitly authorized core-domain slice and remains subject to Draft PR review.
+Phase 1.3 independently audited the technical foundation. Phase 2.0 is merged. Phase 2.1 adds only its explicitly authorized attendance-by-exception slice and remains subject to Draft PR review.
 
-The next phase must remain proposal-only until explicitly requested. Do not infer further authorization from Phase 2.0 implementation.
+The next phase must remain proposal-only until explicitly requested. Do not infer further authorization from Phase 2.1 implementation.

@@ -10,7 +10,17 @@ export class CoreDomainApiService {
     return this.http.get<T>(path, { params });
   }
 
+  getWithParams<T>(path: string, parameters: Record<string, string>) {
+    return this.http.get<T>(path, {
+      params: new HttpParams({ fromObject: parameters }),
+    });
+  }
+
   post<TResponse>(path: string, body: object) {
     return this.http.post<TResponse>(path, body);
+  }
+
+  put<TResponse>(path: string, body: object) {
+    return this.http.put<TResponse>(path, body);
   }
 }

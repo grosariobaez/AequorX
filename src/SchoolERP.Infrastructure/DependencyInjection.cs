@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SchoolERP.Application.Auditing;
 using SchoolERP.Application.Tenancy;
+using SchoolERP.Infrastructure.Auditing;
 using SchoolERP.Infrastructure.Persistence;
 using SchoolERP.Infrastructure.Tenancy;
 
@@ -11,6 +13,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
+        services.AddScoped<IAuditContext, ConfiguredAuditContext>();
         services.AddScoped<ITenantContext, ConfiguredTenantContext>();
 
         services.AddDbContext<SchoolERPDbContext>((serviceProvider, options) =>
