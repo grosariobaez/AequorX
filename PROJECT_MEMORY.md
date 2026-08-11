@@ -21,10 +21,10 @@ Do not rely on this summary in place of the full documents. Read the applicable 
 - Product: multi-tenant SaaS ERP for private schools in the Dominican Republic.
 - Architecture: modular monolith; one backend deployment, one relational database, one Angular application.
 - Phase 1.2 status: **implemented and locally validated on 2026-08-11**.
-- Phase 1.3 has not been executed. It is the next eligible gate and requires an explicit user request.
-- Phase 2.0 and all business features remain unauthorized.
+- Phase 1.3 status: **passed on 2026-08-11 after correcting two gate defects and rerunning all validation**.
+- Phase 2.0 may now be proposed, but it has not been started and still requires an explicit user request.
 - The repository was initially empty except for `.git`; the governing documents and this memory layer are the first project files.
-- Phase 1.3 is a future strict review gate. It becomes applicable only after Phase 1.2 is implemented and validated; merely storing its document does not advance the project phase.
+- Phase 1.3 independently reviewed the implemented bootstrap; its pass advances only the architecture gate and does not implement or authorize a business slice.
 
 ## Phase 1.2 outcome
 
@@ -40,11 +40,17 @@ The target solution contains four backend projects (`Api`, `Application`, `Domai
 - Local SQL Server 2022 Express connectivity and migration application were validated.
 - API exposes `/health/live`, `/health/ready`, and development OpenAPI. Liveness remains healthy with SQL unavailable; readiness becomes 503 without leaking connection details.
 - OpenTelemetry instruments ASP.NET Core, HTTP, runtime, and SQL; Azure Monitor export activates only when environment configuration is present.
-- Angular 22.1 uses strict TypeScript, one standalone application, routing, a responsive Spanish technical shell, and typed health integration through the development proxy.
-- Four .NET test projects execute seven tests total; Angular executes one meaningful Vitest shell/HTTP test.
+- Angular 22.1 uses strict TypeScript, one standalone application, an explicit root `Home` route, a responsive Spanish technical shell, and typed health integration through the development proxy.
+- Four .NET test projects execute seven tests total; Angular executes two meaningful Vitest shell/HTTP/routing tests.
 - One GitHub Actions workflow restores, builds, tests, lints, and uses an ephemeral SQL Server container with a generated test password.
-- Final local results: .NET restore/build/test, npm ci/lint/test/build, database migration, API/frontend startup, both health states, frontend proxy, formatting, NuGet vulnerability scan, npm audit, and secret scan passed.
-- No accepted bootstrap architecture debt or known code issue. GitHub-hosted CI execution awaits a push or pull request and is not claimed as locally executed.
+- Phase 1.3 corrected two required issues: `/` previously redirected to the not-found route while bootstrap content lived globally, and the migration test could reuse an already migrated database. The shell now uses an explicit `Home` route, and the migration test creates, migrates, verifies, and deletes a unique database on every run.
+- Phase 1.3 local results: clean .NET restore/build with 0 warnings, 7/7 .NET tests, format verification, EF migration listing/application against a new database, npm reproducible install with 0 vulnerabilities, lint, 2/2 Angular tests, production build, API/frontend startup, OpenAPI, live/ready health, frontend proxy, controlled SQL failure, vulnerability scan, and secret scan all passed.
+- GitHub-hosted CI execution awaits a push or pull request and is not claimed as locally executed.
+
+## Accepted bootstrap architecture debt
+
+- xUnit 2.9.3 is reported as legacy by NuGet. Migration to xUnit v3 is deferred to a focused test-tooling change because current tests pass and the vulnerability scan is clean.
+- EF Core SQL Server 10.0.10 resolves through Microsoft.Data.SqlClient 6.1.1 to deprecated Azure.Identity 1.14.2 and Microsoft.Identity.Client 4.73.1 packages. They have no reported vulnerability in the configured NuGet sources. Avoid speculative direct overrides; re-evaluate when EF Core/SqlClient publishes a compatible parent update.
 
 ## Non-negotiable constraints
 
@@ -72,6 +78,6 @@ Background-job framework, notification vendor, IaC tool, frontend component libr
 
 ## Working rule
 
-Before declaring Phase 1.2 complete, execute and report the real results of backend restore/build/tests and frontend install/lint/tests/build, plus database, health, telemetry, and architecture validation. Document all deviations; if there are none, state `No deviations.`
+Phase 1.3 has independently audited repository simplicity, dependency direction, domain purity, packages, API host, health and failure behavior, EF Core/migrations, tenant readiness, Angular, security, observability, CI, tests, documentation, configuration, ADR integrity, reproducibility, runtime behavior, and vulnerabilities.
 
-After Phase 1.2, Phase 1.3 must independently audit repository simplicity, dependency direction, domain purity, packages, API host, health and failure behavior, EF Core/migrations, tenant readiness, Angular, security, observability, CI, tests, documentation, configuration, ADR integrity, reproducibility, runtime behavior, and vulnerabilities. A passing review requires real command/runtime evidence and does not itself start Phase 2.0.
+The next phase must remain proposal-only until explicitly requested. Do not infer Phase 2.0 authorization from the Phase 1.3 pass.
