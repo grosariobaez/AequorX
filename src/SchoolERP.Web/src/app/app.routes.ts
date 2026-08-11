@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { AcademicYearsPage } from './pages/academic-years.page';
+import { AttendancePage } from './pages/attendance.page';
 import { EnrollmentsPage } from './pages/enrollments.page';
 import { GradeLevelsPage } from './pages/grade-levels.page';
 import { PeoplePage } from './pages/people.page';
@@ -15,6 +16,7 @@ export const routes: Routes = [
   { path: 'grade-levels', component: GradeLevelsPage },
   { path: 'sections', component: SectionsPage },
   { path: 'enrollments', component: EnrollmentsPage },
+  { path: 'attendance', component: AttendancePage },
   { path: 'not-found', component: NotFound },
   { path: '**', redirectTo: 'not-found' },
 ];

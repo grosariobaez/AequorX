@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolERP.Application.Tenancy;
 using SchoolERP.Domain.Academic;
+using SchoolERP.Domain.Attendance;
 using SchoolERP.Domain.People;
 using SchoolERP.Domain.Platform;
 
@@ -31,6 +32,8 @@ public sealed class SchoolERPDbContext(
 
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
 
+    public DbSet<AttendanceRecord> AttendanceRecords => Set<AttendanceRecord>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(SchoolERPDbContext).Assembly);
@@ -44,5 +47,7 @@ public sealed class SchoolERPDbContext(
         modelBuilder.Entity<GradeLevel>().HasQueryFilter(entity => entity.TenantId == CurrentTenantId);
         modelBuilder.Entity<Section>().HasQueryFilter(entity => entity.TenantId == CurrentTenantId);
         modelBuilder.Entity<Enrollment>().HasQueryFilter(entity => entity.TenantId == CurrentTenantId);
+        modelBuilder.Entity<AttendanceRecord>().HasQueryFilter(
+            entity => entity.TenantId == CurrentTenantId);
     }
 }

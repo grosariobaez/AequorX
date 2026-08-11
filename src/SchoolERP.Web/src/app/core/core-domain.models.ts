@@ -67,3 +67,29 @@ export interface Enrollment {
   status: string;
   enrollmentDate: string;
 }
+
+export type EffectiveAttendanceStatus =
+  | 'Present'
+  | 'Absent'
+  | 'Late'
+  | 'Excused'
+  | 'EarlyDeparture';
+
+export interface AttendanceStudent {
+  enrollmentId: string;
+  studentNumber: string;
+  studentName: string;
+  status: EffectiveAttendanceStatus;
+  note: string | null;
+  createdAt: string | null;
+  createdBy: string | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+}
+
+export interface AttendanceRoster {
+  sectionId: string;
+  sectionName: string;
+  date: string;
+  students: AttendanceStudent[];
+}
