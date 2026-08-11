@@ -1,0 +1,22 @@
+<div class="page-header"><h1>{{ i18n.text('grades') }}</h1></div>
+<section class="panel"><form class="form-grid" (ngSubmit)="loadAssessments()">
+  <label><span>{{ i18n.text('section') }}</span><select name="sectionId" [(ngModel)]="sectionId" required><option value=""></option>@for (section of sections(); track section.id) { <option [value]="section.id">{{ section.name }} · {{ section.gradeLevelName }} · {{ section.academicYearName }}</option> }</select></label>
+  <button type="submit" [disabled]="!sectionId">{{ i18n.text('assessments') }}</button>
+</form></section>
+@if (sectionId) {
+<section class="panel"><h2>{{ i18n.text('createAssessment') }}</h2><form class="form-grid" (ngSubmit)="createAssessment()">
+  <label><span>{{ i18n.text('name') }}</span><input name="name" [(ngModel)]="assessmentForm.name" required /></label>
+  <label><span>{{ i18n.text('date') }}</span><input name="assessmentDate" type="date" [(ngModel)]="assessmentForm.assessmentDate" required /></label>
+  <label><span>{{ i18n.text('maximumScore') }}</span><input name="maximumScore" type="number" min="0.0001" step="0.01" [(ngModel)]="assessmentForm.maximumScore" required /></label>
+  <button type="submit">{{ i18n.text('create') }}</button>
+</form></section>
+<section class="panel"><form class="form-grid" (ngSubmit)="loadGrades()">
+  <label><span>{{ i18n.text('selectAssessment') }}</span><select name="assessmentId" [(ngModel)]="assessmentId" required><option value=""></option>@for (assessment of assessments(); track assessment.id) { <option [value]="assessment.id">{{ assessment.name }} · {{ assessment.assessmentDate }}</option> }</select></label>
+  <button type="submit" [disabled]="!assessmentId">{{ i18n.text('assessment') }}</button>
+</form></section>
+}
+@if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+<div class="command-bar"><button type="button" (click)="saveDrafts()" [disabled]="!assessmentId">{{ i18n.text('saveDraft') }}</button><button type="button" (click)="publish()" [disabled]="!assessmentId">{{ i18n.text('publish') }}</button></div>
+<div class="table-wrap"><table><thead><tr><th>{{ i18n.text('studentNumber') }}</th><th>{{ i18n.text('student') }}</th><th>{{ i18n.text('score') }} / {{ maximumScore() }}</th><th>{{ i18n.text('status') }}</th><th>{{ i18n.text('correct') }}</th></tr></thead><tbody>
+@for (grade of grades(); track grade.enrollmentId) { <tr><td>{{ grade.studentNumber }}</td><td>{{ grade.studentName }}</td><td><input type="number" min="0" [max]="maximumScore()" step="0.01" [(ngModel)]="grade.score" [disabled]="grade.status === 'Published' || grade.status === 'Corrected'" [attr.aria-label]="i18n.text('score') + ' · ' + grade.studentName" /></td><td>{{ i18n.status(grade.status ?? 'NotGraded') }}</td><td>@if (grade.status === 'Published' || grade.status === 'Corrected') { <div class="form-grid"><label><span>{{ i18n.text('score') }}</span><input type="number" min="0" [max]="maximumScore()" [(ngModel)]="grade.correctionScore" /></label><label><span>{{ i18n.text('reason') }}</span><input [(ngModel)]="grade.correctionReason" /></label><button type="button" (click)="correct(grade)">{{ i18n.text('correct') }}</button></div> }</td></tr> } @empty { <tr><td colspan="5" class="empty">{{ i18n.text('noRecords') }}</td></tr> }
+</tbody></table></div>

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SchoolERP.Application.Tenancy;
 using SchoolERP.Domain.Academic;
 using SchoolERP.Domain.Attendance;
+using SchoolERP.Domain.Grading;
 using SchoolERP.Domain.People;
 using SchoolERP.Domain.Platform;
 
@@ -33,6 +34,9 @@ public sealed class SchoolERPDbContext(
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
 
     public DbSet<AttendanceRecord> AttendanceRecords => Set<AttendanceRecord>();
+    public DbSet<Assessment> Assessments => Set<Assessment>();
+    public DbSet<Grade> Grades => Set<Grade>();
+    public DbSet<GradeCorrection> GradeCorrections => Set<GradeCorrection>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -49,5 +53,8 @@ public sealed class SchoolERPDbContext(
         modelBuilder.Entity<Enrollment>().HasQueryFilter(entity => entity.TenantId == CurrentTenantId);
         modelBuilder.Entity<AttendanceRecord>().HasQueryFilter(
             entity => entity.TenantId == CurrentTenantId);
+        modelBuilder.Entity<Assessment>().HasQueryFilter(entity => entity.TenantId == CurrentTenantId);
+        modelBuilder.Entity<Grade>().HasQueryFilter(entity => entity.TenantId == CurrentTenantId);
+        modelBuilder.Entity<GradeCorrection>().HasQueryFilter(entity => entity.TenantId == CurrentTenantId);
     }
 }

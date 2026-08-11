@@ -93,3 +93,28 @@ export interface AttendanceRoster {
   date: string;
   students: AttendanceStudent[];
 }
+
+export interface Assessment {
+  id: string;
+  sectionId: string;
+  name: string;
+  assessmentDate: string;
+  maximumScore: number;
+  isActive: boolean;
+}
+
+export interface GradeStudent {
+  gradeId: string | null;
+  enrollmentId: string;
+  studentNumber: string;
+  studentName: string;
+  score: number | null;
+  status: 'Draft' | 'Published' | 'Corrected' | null;
+}
+
+export interface GradeRoster {
+  assessmentId: string;
+  assessmentName: string;
+  maximumScore: number;
+  students: GradeStudent[];
+}
