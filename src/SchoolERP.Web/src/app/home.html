@@ -1,0 +1,23 @@
+<section class="intro" aria-labelledby="page-title">
+  <p class="eyebrow">Fase 1.2</p>
+  <h1 id="page-title">Fundación del sistema</h1>
+  <p>
+    La aplicación web está activa. Este shell valida routing, diseño adaptable y
+    comunicación con la API sin adelantar funcionalidades escolares.
+  </p>
+
+  <div class="status" aria-live="polite">
+    <span>Estado de la API</span>
+    @switch (healthState()) {
+      @case ('healthy') {
+        <strong class="healthy">Disponible</strong>
+      }
+      @case ('unavailable') {
+        <strong class="unavailable">No disponible</strong>
+      }
+      @default {
+        <strong>Verificando…</strong>
+      }
+    }
+  </div>
+</section>

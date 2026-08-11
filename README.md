@@ -90,7 +90,7 @@ Open `http://localhost:4200`. The development proxy forwards `/health` to the HT
 
 ## Tests
 
-Backend tests use the isolated `SchoolERP_IntegrationTests` database on local SQL Express by default. To use another instance, set `SCHOOLERP_TEST_SQL_CONNECTION_STRING` outside source control.
+Backend tests create and remove a uniquely named `SchoolERP_IntegrationTests_<guid>` database on local SQL Express. To use another instance, set `SCHOOLERP_TEST_SQL_CONNECTION_STRING` outside source control; the database name in that base connection is replaced for the migration test.
 
 ```powershell
 dotnet restore SchoolERP.sln
@@ -107,6 +107,17 @@ npm run lint
 npm test
 npm run build
 ```
+
+## Dependency security pins
+
+- `Microsoft.OpenApi` is referenced directly by the API to keep the ASP.NET OpenAPI
+  dependency graph on the patched 2.11.0 release.
+- npm overrides `@hono/node-server` to 2.1.0 because Angular CLI's development tooling
+  reaches it transitively through the Model Context Protocol SDK.
+
+Keep these pins until their parent packages resolve to equally patched or newer versions.
+Validate any change with `dotnet list package --vulnerable --include-transitive` and
+`npm audit` in addition to the normal build and test commands.
 
 ## Documentation
 

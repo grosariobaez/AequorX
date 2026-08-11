@@ -16,11 +16,11 @@ The full documents are authoritative; this file is only a navigation and safety 
 
 ## Current phase
 
-**Phase 1.2 — Solution Bootstrap is implemented and locally validated.** Phase 1.3 has not been executed. The next eligible task is the Phase 1.3 architecture review, and it must not begin without an explicit user request.
+**Phase 1.3 — Bootstrap Architecture Review passed on 2026-08-11.** Phase 1.2 remains implemented and independently validated. Phase 2.0 may now be proposed, but it has not been started and requires an explicit user request.
 
 Do not implement business features yet, including Student, Enrollment, Attendance, Grades, Billing, Payments, DGII, or Parent Portal functionality. Do not invent business concepts, placeholder entities, fake provider implementations, speculative interfaces, or empty architecture ceremony.
 
-Phase 1.3 may return only `PASS`, `PASS WITH REQUIRED FIXES`, or `FAIL`; it does not authorize Phase 2.0 automatically. Do not begin Phase 2.0 without an explicit user request.
+The Phase 1.3 pass does not authorize Phase 2.0 automatically. Do not begin Phase 2.0 without an explicit user request.
 
 ## Fixed technical baseline
 
