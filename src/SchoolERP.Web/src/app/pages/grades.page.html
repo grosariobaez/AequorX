@@ -1,9 +1,15 @@
 <div class="page-header"><h1>{{ i18n.text('grades') }}</h1></div>
-<section class="panel"><form class="form-grid" (ngSubmit)="loadAssessments()">
+<section class="panel"><form class="form-grid" (ngSubmit)="loadClasses()">
   <label><span>{{ i18n.text('section') }}</span><select name="sectionId" [(ngModel)]="sectionId" required><option value=""></option>@for (section of sections(); track section.id) { <option [value]="section.id">{{ section.name }} · {{ section.gradeLevelName }} · {{ section.academicYearName }}</option> }</select></label>
-  <button type="submit" [disabled]="!sectionId">{{ i18n.text('assessments') }}</button>
+  <button type="submit" [disabled]="!sectionId">{{ i18n.text('classes') }}</button>
 </form></section>
 @if (sectionId) {
+<section class="panel"><form class="form-grid" (ngSubmit)="loadAssessments()">
+  <label><span>{{ i18n.text('class') }}</span><select name="classId" [(ngModel)]="classId" required><option value=""></option>@for (item of classes(); track item.id) { <option [value]="item.id">{{ item.subjectCode }} · {{ item.name }}</option> }</select></label>
+  <button type="submit" [disabled]="!classId">{{ i18n.text('assessments') }}</button>
+</form></section>
+}
+@if (classId) {
 <section class="panel"><h2>{{ i18n.text('createAssessment') }}</h2><form class="form-grid" (ngSubmit)="createAssessment()">
   <label><span>{{ i18n.text('name') }}</span><input name="name" [(ngModel)]="assessmentForm.name" required /></label>
   <label><span>{{ i18n.text('date') }}</span><input name="assessmentDate" type="date" [(ngModel)]="assessmentForm.assessmentDate" required /></label>

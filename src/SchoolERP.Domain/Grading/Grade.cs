@@ -72,9 +72,9 @@ public sealed class Grade
     private static void EnsureCompatible(Assessment assessment, Enrollment enrollment)
     {
         DomainGuard.SameTenant(assessment.TenantId, enrollment.TenantId);
-        if (assessment.SectionId != enrollment.SectionId)
-            throw new InvalidOperationException("Enrollment must belong to the assessment section.");
-        if (assessment.Section.AcademicYearId != enrollment.AcademicYearId)
+        if (assessment.Class.SectionId != enrollment.SectionId)
+            throw new InvalidOperationException("Enrollment must belong to the assessment class section.");
+        if (assessment.Class.Section.AcademicYearId != enrollment.AcademicYearId)
             throw new InvalidOperationException("Enrollment must belong to the assessment academic year.");
     }
 

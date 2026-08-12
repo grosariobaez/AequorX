@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { CoreDomainApiService } from '../core/core-domain-api.service';
-import { Assessment, GradeRoster, GradeStudent, Section } from '../core/core-domain.models';
+import { Assessment, GradeRoster, GradeStudent, SchoolClass, Section } from '../core/core-domain.models';
 import { I18nService } from '../core/i18n.service';
 
 interface GradeEdit extends GradeStudent {
@@ -17,10 +17,12 @@ export class GradesPage {
   private readonly api = inject(CoreDomainApiService);
   protected readonly sections = signal<Section[]>([]);
   protected readonly assessments = signal<Assessment[]>([]);
+  protected readonly classes = signal<SchoolClass[]>([]);
   protected readonly grades = signal<GradeEdit[]>([]);
   protected readonly maximumScore = signal(0);
   protected readonly error = signal<string | null>(null);
   protected sectionId = '';
+  protected classId = '';
   protected assessmentId = '';
   protected assessmentForm = { name: '', assessmentDate: '', maximumScore: 100 };
 
@@ -31,16 +33,24 @@ export class GradesPage {
     });
   }
 
-  protected loadAssessments(): void {
+  protected loadClasses(): void {
     if (!this.sectionId) return;
-    this.api.getWithParams<Assessment[]>('/api/assessments', { sectionId: this.sectionId }).subscribe({
-      next: (value) => { this.assessments.set(value); this.grades.set([]); },
+    this.api.getWithParams<SchoolClass[]>('/api/classes', { sectionId: this.sectionId }).subscribe({
+      next: (value) => { this.classes.set(value); this.classId = ''; this.assessments.set([]); this.grades.set([]); },
+      error: () => this.error.set(this.i18n.text('loadError')),
+    });
+  }
+
+  protected loadAssessments(): void {
+    if (!this.classId) return;
+    this.api.getWithParams<Assessment[]>('/api/assessments', { classId: this.classId }).subscribe({
+      next: (value) => { this.assessments.set(value); this.assessmentId = ''; this.grades.set([]); },
       error: () => this.error.set(this.i18n.text('loadError')),
     });
   }
 
   protected createAssessment(): void {
-    this.api.post<Assessment>('/api/assessments', { sectionId: this.sectionId, ...this.assessmentForm }).subscribe({
+    this.api.post<Assessment>('/api/assessments', { classId: this.classId, ...this.assessmentForm }).subscribe({
       next: () => { this.assessmentForm = { name: '', assessmentDate: '', maximumScore: 100 }; this.loadAssessments(); },
       error: () => this.error.set(this.i18n.text('saveError')),
     });

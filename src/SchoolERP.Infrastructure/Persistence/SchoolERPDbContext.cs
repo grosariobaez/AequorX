@@ -31,6 +31,10 @@ public sealed class SchoolERPDbContext(
 
     public DbSet<Section> Sections => Set<Section>();
 
+    public DbSet<Subject> Subjects => Set<Subject>();
+
+    public DbSet<Class> Classes => Set<Class>();
+
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
 
     public DbSet<AttendanceRecord> AttendanceRecords => Set<AttendanceRecord>();
@@ -50,6 +54,8 @@ public sealed class SchoolERPDbContext(
         modelBuilder.Entity<AcademicYear>().HasQueryFilter(entity => entity.TenantId == CurrentTenantId);
         modelBuilder.Entity<GradeLevel>().HasQueryFilter(entity => entity.TenantId == CurrentTenantId);
         modelBuilder.Entity<Section>().HasQueryFilter(entity => entity.TenantId == CurrentTenantId);
+        modelBuilder.Entity<Subject>().HasQueryFilter(entity => entity.TenantId == CurrentTenantId);
+        modelBuilder.Entity<Class>().HasQueryFilter(entity => entity.TenantId == CurrentTenantId);
         modelBuilder.Entity<Enrollment>().HasQueryFilter(entity => entity.TenantId == CurrentTenantId);
         modelBuilder.Entity<AttendanceRecord>().HasQueryFilter(
             entity => entity.TenantId == CurrentTenantId);
