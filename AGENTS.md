@@ -16,7 +16,7 @@ The full documents are authoritative; this file is only a navigation and safety 
 
 ## Current phase
 
-**Phase 2.3 — Subjects & Classes Foundation is implemented on its dedicated branch for Draft PR review.** Phases 1.2 and 1.3 are complete. Phases 2.0, 2.1, and 2.2 are complete and merged.
+**Phase 2.3 — Subjects & Classes Foundation is complete and merged.** Phases 1.2 and 1.3 are complete. Phases 2.0, 2.1, and 2.2 are complete and merged.
 
 Phase 2.3 is limited to Subject, Class, Assessment → Class, minimal APIs, and localized Subject/Class/grading workflows. Do not implement teacher assignments, schedules, periods, classrooms, curriculum management, weighting, GPA, promotion, report cards, averages, grading scales, competencies/rubrics, notifications, portals, AI, billing, or fiscal work.
 
