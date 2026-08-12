@@ -20,21 +20,21 @@ internal static class GradingEndpoints
         return endpoints;
     }
 
-    private static async Task<IResult> GetAssessmentsAsync(Guid sectionId, SchoolERPDbContext database, CancellationToken token)
+    private static async Task<IResult> GetAssessmentsAsync(Guid classId, SchoolERPDbContext database, CancellationToken token)
     {
-        if (!await database.Sections.AnyAsync(x => x.Id == sectionId, token)) return Results.NotFound();
+        if (!await database.Classes.AnyAsync(x => x.Id == classId, token)) return Results.NotFound();
         return Results.Ok(await database.Assessments.AsNoTracking()
-            .Where(x => x.SectionId == sectionId).OrderByDescending(x => x.AssessmentDate)
-            .Select(x => new AssessmentResponse(x.Id, x.SectionId, x.Name, x.AssessmentDate, x.MaximumScore, x.IsActive))
+            .Where(x => x.ClassId == classId).OrderByDescending(x => x.AssessmentDate)
+            .Select(x => new AssessmentResponse(x.Id, x.ClassId, x.Name, x.AssessmentDate, x.MaximumScore, x.IsActive))
             .ToListAsync(token));
     }
 
     private static async Task<IResult> CreateAssessmentAsync(CreateAssessmentRequest request, SchoolERPDbContext database, CancellationToken token)
     {
-        var section = await database.Sections.Include(x => x.AcademicYear)
-            .SingleOrDefaultAsync(x => x.Id == request.SectionId, token);
-        if (section is null) return Results.NotFound();
-        var assessment = new Assessment(section, request.Name, request.AssessmentDate, request.MaximumScore);
+        var @class = await database.Classes.Include(x => x.Section).ThenInclude(x => x.AcademicYear)
+            .SingleOrDefaultAsync(x => x.Id == request.ClassId, token);
+        if (@class is null) return Results.NotFound();
+        var assessment = new Assessment(@class, request.Name, request.AssessmentDate, request.MaximumScore);
         database.Assessments.Add(assessment);
         await database.SaveChangesAsync(token);
         return Results.Created($"/api/assessments/{assessment.Id}", ToResponse(assessment));
@@ -42,11 +42,11 @@ internal static class GradingEndpoints
 
     private static async Task<IResult> GetGradesAsync(Guid assessmentId, SchoolERPDbContext database, CancellationToken token)
     {
-        var assessment = await database.Assessments.AsNoTracking()
+        var assessment = await database.Assessments.AsNoTracking().Include(x => x.Class)
             .SingleOrDefaultAsync(x => x.Id == assessmentId, token);
         if (assessment is null) return Results.NotFound();
         var roster = await database.Enrollments.AsNoTracking()
-            .Where(x => x.SectionId == assessment.SectionId && x.Status == EnrollmentStatus.Active)
+            .Where(x => x.SectionId == assessment.Class.SectionId && x.Status == EnrollmentStatus.Active)
             .OrderBy(x => x.Student.Person.LastName).ThenBy(x => x.Student.Person.FirstName)
             .Select(x => new EnrollmentSnapshot(x.Id, x.Student.StudentNumber, x.Student.Person.FirstName + " " + x.Student.Person.LastName))
             .ToListAsync(token);
@@ -61,7 +61,7 @@ internal static class GradingEndpoints
     private static async Task<IResult> PutGradeAsync(Guid assessmentId, Guid enrollmentId, GradeUpdateRequest request,
         SchoolERPDbContext database, IAuditContext audit, CancellationToken token)
     {
-        var assessment = await database.Assessments.Include(x => x.Section).ThenInclude(x => x.AcademicYear)
+        var assessment = await database.Assessments.Include(x => x.Class).ThenInclude(x => x.Section).ThenInclude(x => x.AcademicYear)
             .SingleOrDefaultAsync(x => x.Id == assessmentId, token);
         var enrollment = await database.Enrollments.Include(x => x.AcademicYear).Include(x => x.Section)
             .Include(x => x.Student).ThenInclude(x => x.Person)
@@ -109,15 +109,15 @@ internal static class GradingEndpoints
         });
     }
 
-    private static AssessmentResponse ToResponse(Assessment x) => new(x.Id, x.SectionId, x.Name, x.AssessmentDate, x.MaximumScore, x.IsActive);
+    private static AssessmentResponse ToResponse(Assessment x) => new(x.Id, x.ClassId, x.Name, x.AssessmentDate, x.MaximumScore, x.IsActive);
     private static GradeStudentResponse ToResponse(EnrollmentSnapshot x, Grade? grade) => new(grade?.Id, x.Id, x.StudentNumber, x.StudentName, grade?.Score, grade?.Status.ToString());
     private static GradeStudentResponse ToResponse(Enrollment x, Grade grade) => new(grade.Id, x.Id, x.Student.StudentNumber,
         x.Student.Person.FirstName + " " + x.Student.Person.LastName, grade.Score, grade.Status.ToString());
 
-    private sealed record CreateAssessmentRequest(Guid SectionId, string Name, DateOnly AssessmentDate, decimal MaximumScore);
+    private sealed record CreateAssessmentRequest(Guid ClassId, string Name, DateOnly AssessmentDate, decimal MaximumScore);
     private sealed record GradeUpdateRequest(decimal Score);
     private sealed record GradeCorrectionRequest(decimal Score, string Reason);
-    private sealed record AssessmentResponse(Guid Id, Guid SectionId, string Name, DateOnly AssessmentDate, decimal MaximumScore, bool IsActive);
+    private sealed record AssessmentResponse(Guid Id, Guid ClassId, string Name, DateOnly AssessmentDate, decimal MaximumScore, bool IsActive);
     private sealed record EnrollmentSnapshot(Guid Id, string StudentNumber, string StudentName);
     private sealed record GradeRosterResponse(Guid AssessmentId, string AssessmentName, decimal MaximumScore, IEnumerable<GradeStudentResponse> Students);
     private sealed record GradeStudentResponse(Guid? GradeId, Guid EnrollmentId, string StudentNumber, string StudentName, decimal? Score, string? Status);

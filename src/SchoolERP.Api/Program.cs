@@ -106,6 +106,7 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
 
 app.MapCoreDomainEndpoints();
 app.MapAttendanceEndpoints();
+app.MapAcademicStructureEndpoints();
 app.MapGradingEndpoints();
 
 app.Run();

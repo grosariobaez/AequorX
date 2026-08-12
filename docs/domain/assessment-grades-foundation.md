@@ -5,10 +5,10 @@ English; the grading screen defaults to Spanish and also supports English.
 
 ## Model and invariants
 
-- Assessment represents one grading activity for one tenant-scoped Section.
-- MaximumScore is positive and AssessmentDate falls within the Section AcademicYear.
+- Assessment represents one grading activity for one tenant-scoped Class.
+- MaximumScore is positive and AssessmentDate falls within the Class Section's AcademicYear.
 - Grade links one active Enrollment to one Assessment. Enrollment belongs to the
-  Assessment Section and AcademicYear, and Score is between zero and MaximumScore.
+  Assessment Class's Section and AcademicYear, and Score is between zero and MaximumScore.
 - TenantId, AssessmentId, and EnrollmentId uniquely identify a Grade.
 - Tenant filters and composite foreign keys protect reads and writes.
 
@@ -24,13 +24,13 @@ English; the grading screen defaults to Spanish and also supports English.
 
 ## API and UI
 
-The API contains only section assessment listing/creation, assessment roster grade
+The API contains only class assessment listing/creation, assessment roster grade
 entry, explicit publishing, and grade correction. The single grading screen follows:
-select section, select/create assessment, enter Draft scores, publish, and explicitly
+select section, select class, select/create assessment, enter Draft scores, publish, and explicitly
 correct an official score with a reason.
 
 ## Deferred
 
-Subjects/classes, teacher assignments, schedules, weighting formulas, GPA, promotion,
-report cards, term averages, configurable scales, competencies/rubrics, notifications,
+Teacher assignments, schedules, weighting formulas, GPA, promotion, report cards,
+term averages, configurable scales, competencies/rubrics, notifications,
 portals, AI, billing, and fiscal functionality are not implemented.

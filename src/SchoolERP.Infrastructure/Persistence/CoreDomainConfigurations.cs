@@ -241,6 +241,41 @@ internal sealed class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollm
     }
 }
 
+internal sealed class SubjectConfiguration : IEntityTypeConfiguration<Subject>
+{
+    public void Configure(EntityTypeBuilder<Subject> builder)
+    {
+        builder.ToTable("Subjects");
+        builder.HasKey(entity => entity.Id);
+        builder.HasAlternateKey(entity => new { entity.TenantId, entity.Id });
+        builder.Property(entity => entity.Name).HasMaxLength(200).IsRequired();
+        builder.Property(entity => entity.Code).HasMaxLength(50).IsRequired();
+        builder.HasIndex(entity => new { entity.TenantId, entity.Code }).IsUnique();
+        builder.HasOne<Tenant>().WithMany().HasForeignKey(entity => entity.TenantId)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+}
+
+internal sealed class ClassConfiguration : IEntityTypeConfiguration<Class>
+{
+    public void Configure(EntityTypeBuilder<Class> builder)
+    {
+        builder.ToTable("Classes");
+        builder.HasKey(entity => entity.Id);
+        builder.HasAlternateKey(entity => new { entity.TenantId, entity.Id });
+        builder.Property(entity => entity.Name).HasMaxLength(200).IsRequired();
+        builder.HasIndex(entity => new { entity.TenantId, entity.SectionId, entity.SubjectId }).IsUnique();
+        builder.HasOne(entity => entity.Section).WithMany()
+            .HasForeignKey(entity => new { entity.TenantId, entity.SectionId })
+            .HasPrincipalKey(entity => new { entity.TenantId, entity.Id })
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(entity => entity.Subject).WithMany()
+            .HasForeignKey(entity => new { entity.TenantId, entity.SubjectId })
+            .HasPrincipalKey(entity => new { entity.TenantId, entity.Id })
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+}
+
 internal sealed class AssessmentConfiguration : IEntityTypeConfiguration<Assessment>
 {
     public void Configure(EntityTypeBuilder<Assessment> builder)
@@ -250,9 +285,9 @@ internal sealed class AssessmentConfiguration : IEntityTypeConfiguration<Assessm
         builder.HasAlternateKey(entity => new { entity.TenantId, entity.Id });
         builder.Property(entity => entity.Name).HasMaxLength(200).IsRequired();
         builder.Property(entity => entity.MaximumScore).HasPrecision(18, 4);
-        builder.HasIndex(entity => new { entity.TenantId, entity.SectionId, entity.AssessmentDate });
-        builder.HasOne(entity => entity.Section).WithMany()
-            .HasForeignKey(entity => new { entity.TenantId, entity.SectionId })
+        builder.HasIndex(entity => new { entity.TenantId, entity.ClassId, entity.AssessmentDate });
+        builder.HasOne(entity => entity.Class).WithMany()
+            .HasForeignKey(entity => new { entity.TenantId, entity.ClassId })
             .HasPrincipalKey(entity => new { entity.TenantId, entity.Id })
             .OnDelete(DeleteBehavior.Restrict);
     }

@@ -11,11 +11,11 @@ public sealed class GradingInvariantTests
     [InlineData(0)]
     [InlineData(-1)]
     public void Assessment_requires_positive_maximum_score(decimal maximum) =>
-        Assert.Throws<ArgumentOutOfRangeException>(() => new Assessment(Setup().Section, "Quiz", new DateOnly(2026, 9, 1), maximum));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new Assessment(Setup().Class, "Quiz", new DateOnly(2026, 9, 1), maximum));
 
     [Fact]
     public void Assessment_date_must_be_inside_academic_year() =>
-        Assert.Throws<ArgumentOutOfRangeException>(() => new Assessment(Setup().Section, "Quiz", new DateOnly(2027, 7, 1), 100));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new Assessment(Setup().Class, "Quiz", new DateOnly(2027, 7, 1), 100));
 
     [Theory]
     [InlineData(-1)]
@@ -68,9 +68,10 @@ public sealed class GradingInvariantTests
         var section = new Section(year, new GradeLevel(tenant.Id, "First", $"01-{code}", 1), new Campus(tenant, "Main", $"MAIN-{code}"), "A", $"A-{code}");
         var student = new StudentProfile(new Person(tenant.Id, "Ana", "Pérez"), $"S-{code}");
         var enrollment = new Enrollment(student, year, section, EnrollmentStatus.Active, new DateOnly(2026, 8, 15));
-        var assessment = new Assessment(section, "Quiz", new DateOnly(2026, 9, 1), 100);
-        return new SetupGraph(section, enrollment, assessment);
+        var @class = new Class(section, new Subject(tenant.Id, "Mathematics", $"MAT-{code}"));
+        var assessment = new Assessment(@class, "Quiz", new DateOnly(2026, 9, 1), 100);
+        return new SetupGraph(@class, enrollment, assessment);
     }
 
-    private sealed record SetupGraph(Section Section, Enrollment Enrollment, Assessment Assessment);
+    private sealed record SetupGraph(Class Class, Enrollment Enrollment, Assessment Assessment);
 }

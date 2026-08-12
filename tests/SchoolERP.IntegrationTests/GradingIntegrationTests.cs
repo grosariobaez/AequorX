@@ -22,7 +22,7 @@ public sealed class GradingIntegrationTests
             using var client = factory.CreateHttpsClient();
             var created = await client.PostAsJsonAsync("/api/assessments", new
             {
-                sectionId = setup.SectionId,
+                classId = setup.ClassId,
                 name = "Quiz 1",
                 assessmentDate = "2026-09-01",
                 maximumScore = 100
@@ -71,8 +71,8 @@ public sealed class GradingIntegrationTests
             await using var scope = factory.Services.CreateAsyncScope();
             var database = scope.ServiceProvider.GetRequiredService<SchoolERPDbContext>();
             var enrollment = await database.Enrollments.Include(x => x.AcademicYear).Include(x => x.Section).SingleAsync(x => x.Id == setup.EnrollmentId);
-            var section = await database.Sections.Include(x => x.AcademicYear).SingleAsync(x => x.Id == setup.SectionId);
-            var assessment = new Assessment(section, "Quiz", new DateOnly(2026, 9, 1), 100);
+            var @class = await database.Classes.Include(x => x.Section).ThenInclude(x => x.AcademicYear).SingleAsync(x => x.Id == setup.ClassId);
+            var assessment = new Assessment(@class, "Quiz", new DateOnly(2026, 9, 1), 100);
             database.AddRange(new Grade(assessment, enrollment, 80, "teacher"), new Grade(assessment, enrollment, 90, "teacher"));
             await Assert.ThrowsAsync<DbUpdateException>(() => database.SaveChangesAsync());
         }
@@ -80,7 +80,7 @@ public sealed class GradingIntegrationTests
     }
 
     [Fact]
-    public async Task Assessment_api_hides_foreign_tenant_section()
+    public async Task Assessment_api_hides_foreign_tenant_class()
     {
         await using var factory = new ApiFactory(isolateDatabase: true);
         try
@@ -90,12 +90,15 @@ public sealed class GradingIntegrationTests
             await using (var scope = factory.Services.CreateAsyncScope())
             {
                 var database = scope.ServiceProvider.GetRequiredService<SchoolERPDbContext>();
-                database.Add(foreign.Tenant); database.Add(foreign.Enrollment); await database.SaveChangesAsync();
+                var subject = new Subject(foreign.Tenant.Id, "Mathematics", "MAT");
+                var @class = new Class(foreign.Section, subject);
+                database.Add(foreign.Tenant); database.Add(foreign.Enrollment); database.Add(@class); await database.SaveChangesAsync();
+                foreign = foreign with { ClassId = @class.Id };
             }
             using var client = factory.CreateHttpsClient();
-            Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync($"/api/assessments?sectionId={foreign.Section.Id}")).StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync($"/api/assessments?classId={foreign.ClassId}")).StatusCode);
             Assert.Equal(HttpStatusCode.NotFound, (await client.PostAsJsonAsync("/api/assessments", new
-            { sectionId = foreign.Section.Id, name = "Quiz", assessmentDate = "2026-09-01", maximumScore = 100 })).StatusCode);
+            { classId = foreign.ClassId, name = "Quiz", assessmentDate = "2026-09-01", maximumScore = 100 })).StatusCode);
         }
         finally { await DeleteDatabase(factory); }
     }
@@ -106,8 +109,10 @@ public sealed class GradingIntegrationTests
         await using var scope = factory.Services.CreateAsyncScope();
         var database = scope.ServiceProvider.GetRequiredService<SchoolERPDbContext>();
         var graph = BuildEnrollment(factory.TenantId, "CURRENT");
-        database.Add(graph.Tenant); database.Add(graph.Enrollment); await database.SaveChangesAsync();
-        return new SetupIds(graph.Section.Id, graph.Enrollment.Id);
+        var subject = new Subject(factory.TenantId, "Mathematics", "MAT");
+        var @class = new Class(graph.Section, subject);
+        database.Add(graph.Tenant); database.Add(graph.Enrollment); database.Add(@class); await database.SaveChangesAsync();
+        return new SetupIds(@class.Id, graph.Enrollment.Id);
     }
 
     private static EnrollmentGraph BuildEnrollment(Guid tenantId, string code)
@@ -116,14 +121,14 @@ public sealed class GradingIntegrationTests
         var year = new AcademicYear(tenantId, "2026-2027", new DateOnly(2026, 8, 1), new DateOnly(2027, 6, 30), AcademicYearStatus.Active);
         var section = new Section(year, new GradeLevel(tenantId, "First", $"01-{code}", 1), new Campus(tenant, "Main", $"MAIN-{code}"), "A", $"A-{code}");
         var student = new StudentProfile(new Person(tenantId, "Ana", "Pérez"), $"S-{code}");
-        return new EnrollmentGraph(tenant, section, new Enrollment(student, year, section, EnrollmentStatus.Active, new DateOnly(2026, 8, 15)));
+        return new EnrollmentGraph(tenant, section, new Enrollment(student, year, section, EnrollmentStatus.Active, new DateOnly(2026, 8, 15)), Guid.Empty);
     }
 
     private static async Task MigrateAsync(ApiFactory factory) { await using var scope = factory.Services.CreateAsyncScope(); await scope.ServiceProvider.GetRequiredService<SchoolERPDbContext>().Database.MigrateAsync(); }
     private static async Task DeleteDatabase(ApiFactory factory) { await using var scope = factory.Services.CreateAsyncScope(); await scope.ServiceProvider.GetRequiredService<SchoolERPDbContext>().Database.EnsureDeletedAsync(); }
-    private sealed record EnrollmentGraph(Tenant Tenant, Section Section, Enrollment Enrollment);
-    private sealed record SetupIds(Guid SectionId, Guid EnrollmentId);
-    private sealed record AssessmentResponse(Guid Id, Guid SectionId, string Name, DateOnly AssessmentDate, decimal MaximumScore, bool IsActive);
+    private sealed record EnrollmentGraph(Tenant Tenant, Section Section, Enrollment Enrollment, Guid ClassId);
+    private sealed record SetupIds(Guid ClassId, Guid EnrollmentId);
+    private sealed record AssessmentResponse(Guid Id, Guid ClassId, string Name, DateOnly AssessmentDate, decimal MaximumScore, bool IsActive);
     private sealed record GradeRosterResponse(Guid AssessmentId, string AssessmentName, decimal MaximumScore, List<GradeStudentResponse> Students);
     private sealed record GradeStudentResponse(Guid? GradeId, Guid EnrollmentId, string StudentNumber, string StudentName, decimal? Score, string? Status);
 }

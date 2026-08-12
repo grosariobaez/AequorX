@@ -96,10 +96,27 @@ export interface AttendanceRoster {
 
 export interface Assessment {
   id: string;
-  sectionId: string;
+  classId: string;
   name: string;
   assessmentDate: string;
   maximumScore: number;
+  isActive: boolean;
+}
+
+export interface Subject {
+  id: string;
+  name: string;
+  code: string;
+  isActive: boolean;
+}
+
+export interface SchoolClass {
+  id: string;
+  sectionId: string;
+  subjectId: string;
+  name: string;
+  subjectName: string;
+  subjectCode: string;
   isActive: boolean;
 }
 

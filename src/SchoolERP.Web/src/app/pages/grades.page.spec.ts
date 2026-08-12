@@ -10,7 +10,7 @@ describe('Grades workflow', () => {
   });
   afterEach(() => TestBed.inject(HttpTestingController).verify());
 
-  it('saves a Draft, publishes explicitly, and localizes the workflow', async () => {
+  it('selects a class, saves a Draft, publishes explicitly, and localizes the workflow', async () => {
     const fixture = TestBed.createComponent(GradesPage);
     const http = TestBed.inject(HttpTestingController);
     fixture.detectChanges();
@@ -21,15 +21,23 @@ describe('Grades workflow', () => {
     section.value = 'section-1'; section.dispatchEvent(new Event('change', { bubbles: true }));
     fixture.detectChanges(); await fixture.whenStable(); fixture.detectChanges();
     (fixture.nativeElement.querySelector('form button') as HTMLButtonElement).click();
-    http.expectOne((request) => request.url === '/api/assessments' && request.params.get('sectionId') === 'section-1')
-      .flush([{ id: 'assessment-1', sectionId: 'section-1', name: 'Quiz', assessmentDate: '2026-09-01', maximumScore: 100, isActive: true }]);
+    http.expectOne((request) => request.url === '/api/classes' && request.params.get('sectionId') === 'section-1')
+      .flush([{ id: 'class-1', sectionId: 'section-1', subjectId: 'subject-1', name: 'Matemáticas · A', subjectName: 'Matemáticas', subjectCode: 'MAT', isActive: true }]);
     fixture.detectChanges(); await fixture.whenStable(); fixture.detectChanges();
 
-    const assessment = fixture.nativeElement.querySelectorAll('select')[1] as HTMLSelectElement;
+    const selectedClass = fixture.nativeElement.querySelectorAll('select')[1] as HTMLSelectElement;
+    selectedClass.value = 'class-1'; selectedClass.dispatchEvent(new Event('change', { bubbles: true }));
+    fixture.detectChanges(); await fixture.whenStable(); fixture.detectChanges();
+    (fixture.nativeElement.querySelectorAll('form')[1].querySelector('button') as HTMLButtonElement).click();
+    http.expectOne((request) => request.url === '/api/assessments' && request.params.get('classId') === 'class-1')
+      .flush([{ id: 'assessment-1', classId: 'class-1', name: 'Quiz', assessmentDate: '2026-09-01', maximumScore: 100, isActive: true }]);
+    fixture.detectChanges(); await fixture.whenStable(); fixture.detectChanges();
+
+    const assessment = fixture.nativeElement.querySelectorAll('select')[2] as HTMLSelectElement;
     assessment.value = 'assessment-1'; assessment.dispatchEvent(new Event('change', { bubbles: true }));
     fixture.detectChanges(); await fixture.whenStable(); fixture.detectChanges();
     const forms = fixture.nativeElement.querySelectorAll('form') as NodeListOf<HTMLFormElement>;
-    (forms[2].querySelector('button') as HTMLButtonElement).click();
+    (forms[3].querySelector('button') as HTMLButtonElement).click();
     http.expectOne('/api/assessments/assessment-1/grades').flush(roster(null, null));
     fixture.detectChanges(); await fixture.whenStable(); fixture.detectChanges();
 

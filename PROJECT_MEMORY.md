@@ -28,6 +28,8 @@ Do not rely on this summary in place of the full documents. Read the applicable 
 - Phase 2.1 was explicitly authorized by `Phase 2.1 — Attendance Foundation.md` (attachment SHA-256 `75219B07966052689AA0B97AB57DF9CB062ADF067A6955C9E3EEFB1DF790F0DF`).
 - Phase 2.2 status: **complete and merged into `main` on 2026-08-11**.
 - Phase 2.2 was explicitly authorized by `Phase 2.2 — Assessment & Grades Foundation.md` (attachment SHA-256 `C69A65D4387E33CA4468951FB67D0B3DB956CC7547A64D7DB6264D56EECC58F6`).
+- Phase 2.3 status: **implemented on `agent/phase-2-3-subjects-classes-foundation` for Draft PR review**.
+- Phase 2.3 was explicitly authorized by `Phase 2.3 — Subjects & Classes Foundation.md` (attachment SHA-256 `3210365D063A867A00283D042CD715BC826A491F8567FEEB5EA1AF1BD7395309`).
 - The repository was initially empty except for `.git`; the governing documents and this memory layer are the first project files.
 - Phase 1.3 independently reviewed the implemented bootstrap; its pass advances only the architecture gate and does not implement or authorize a business slice.
 
@@ -84,7 +86,16 @@ The target solution contains four backend projects (`Api`, `Application`, `Domai
 - Migration `20260811205022_Phase22AssessmentGradesFoundation` adds Assessments, Grades, GradeCorrections, and tenant-aware constraints.
 - The API exposes only the five required assessment, grade-entry, publish, and correction capabilities. Angular adds one focused Spanish-default/English-secondary grading screen.
 - Phase 2.2 validation passed: clean .NET build, 35/35 .NET tests, format verification, Angular lint, 4/4 Angular tests, production build, and GitHub-hosted CI.
-- No next phase is authorized. Subjects/classes, teacher assignments, schedules, weighting, GPA, promotion, report cards, term averages, grading scales, competencies/rubrics, notifications, portals, AI, billing, and fiscal work remain deferred.
+- Subject/Class and Assessment → Class were subsequently authorized only through the Phase 2.3 slice documented below.
+
+## Phase 2.3 implementation state
+
+- Subject is tenant-scoped and has a tenant-unique normalized Code. Class joins one Subject to one Section, with tenant-safe foreign keys and one class per Subject + Section.
+- Assessment now belongs to Class and derives Section and AcademicYear through it. Assessment date, Grade Enrollment placement, and the Draft/Published/Corrected lifecycle remain enforced.
+- Migration `20260811235234_Phase23SubjectsClassesFoundation` creates Subjects and Classes. Because legacy Assessment rows cannot be mapped to a Subject deterministically, it stops before schema changes when such rows exist instead of inventing academic data or dropping grading history.
+- The API provides only Subject/Class list/create plus Class-filtered Assessment operations. Angular adds localized Subject and Class workflows and updates grading to Section → Class → Assessment.
+- Local Phase 2.3 validation passed: clean .NET Release build, 39/39 .NET tests, Angular lint, 5/5 Angular tests, and production build. GitHub-hosted CI remains to be recorded at publication.
+- No next phase is authorized. Teacher assignments, schedules, periods, classrooms, curriculum management, weighting, GPA, promotion, report cards, averages, configurable grading scales, competencies/rubrics, notifications, portals, AI, billing, and fiscal work remain deferred.
 
 ## Accepted bootstrap architecture debt
 
@@ -119,4 +130,4 @@ Background-job framework, notification vendor, IaC tool, frontend component libr
 
 Phase 1.3 independently audited the technical foundation. Phases 2.0, 2.1, and 2.2 are complete and merged.
 
-The next phase must remain proposal-only until explicitly requested. Do not infer further authorization from Phase 2.2 implementation.
+Phase 2.3 is implemented only for Draft PR review. The next phase must remain proposal-only until explicitly requested.
